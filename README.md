@@ -1,8 +1,8 @@
-# Trust Bond Board (v0 demo)
+# ShoppingOye (v0 demo)
 
 Pakistan ki bharosemand online shops ka pay-to-rank board.
 
-Mechanic: bond = trust badge (refundable amanat), boost = rank (non-refundable, monthly).
+Mechanic: bond = trust badge (refundable amanat), boost = rank (one-time cumulative total, non-refundable).
 Model: Outbid-style public leaderboard + trust-bond twist for Pakistan's COD/trust problem.
 
 ## What works in v0 (static site, GitHub Pages)
@@ -31,8 +31,8 @@ Listings in v0 are sample data, clearly labelled as demo.
 - Supabase database: shops, bonds, boosts, disputes (replaces `assets/data.js`)
 - Admin verification of JazzCash/Easypaisa bond payments
 - Real WhatsApp order buttons per shop
-- Monthly boost expiry and outbid alerts
-- Custom domain once revenue starts
+- Boost top-up and outbid alerts
+- Custom domain (shoppingoye.com, available) once purchased and connected
 
 ## Rules that never change
 
