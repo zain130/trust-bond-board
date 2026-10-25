@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Category Board — Trust Bond Board</title>
+<title>Category Board — ShoppingOye</title>
 <link rel="stylesheet" href="assets/style.css?v=5">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,7 +11,7 @@
 </head>
 <body>
 <header class="site"><div class="wrap">
-  <a class="logo" href="index.html">Trust<span>Bond</span> Board</a>
+  <a class="logo" href="index.html">Shopping<span>Oye</span></a>
   <nav class="main">
     <a href="index.html">Home</a>
     <a class="cta" href="submit.html">List Your Shop</a>
@@ -40,7 +40,7 @@ if(!cat){
   document.getElementById("board-title").textContent = "Category not found";
   document.getElementById("board-sub").textContent = "Go back to the homepage and pick a category board.";
 } else {
-  document.title = cat.name + " — Trust Bond Board";
+  document.title = cat.name + " — ShoppingOye";
   document.getElementById("board-title").textContent = cat.icon + " " + cat.name;
   document.getElementById("board-sub").textContent = "Subcategories: " + cat.subs.join(" · ");
   const shops = rankedShops(slug);

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Shop — Trust Bond Board</title>
+<title>Shop — ShoppingOye</title>
 <link rel="stylesheet" href="assets/style.css?v=5">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,7 +11,7 @@
 </head>
 <body>
 <header class="site"><div class="wrap">
-  <a class="logo" href="index.html">Trust<span>Bond</span> Board</a>
+  <a class="logo" href="index.html">Shopping<span>Oye</span></a>
   <nav class="main">
     <a href="index.html">Home</a>
     <a class="cta" href="submit.html">List Your Shop</a>
@@ -51,7 +51,7 @@ if(!s){
       ${waDigits ? `<div class="actions"><a class="btn wa" href="${waLink("Hi, I want to order " + p.name + " (" + money(p.price) + ") from " + s.name + ".")}">Order this</a></div>` : `<p style="font-size:13px">Order ke liye shop ka WhatsApp jald aa raha hai.</p>`}
     </div>`).join("")}</div>`
     : "<p>No products listed yet.</p>";
-  document.title = s.name + " — Trust Bond Board";
+  document.title = s.name + " — ShoppingOye";
   document.getElementById("shop-box").innerHTML = `
     <div class="shop-hero">
       <div class="avatar">${s.name.charAt(0).toUpperCase()}</div>
@@ -67,7 +67,7 @@ if(!s){
       <div class="stat"><b>${money(s.boost)}</b><span>Total boost paid</span></div>
       <div class="stat"><b>${s.orders}</b><span>Orders served</span></div>
     </div>
-    ${waDigits ? `<p><a class="btn wa" href="${waLink("Hi " + s.name + ", I want to order from Trust Bond Board.")}">Order on WhatsApp</a></p>` : ""}
+    ${waDigits ? `<p><a class="btn wa" href="${waLink("Hi " + s.name + ", I want to order from ShoppingOye.")}">Order on WhatsApp</a></p>` : ""}
     ${rank > 1 ? `<p class="climb">${s.boost > 0 ? `Top position ke liye total ${money(topTotal + 1000)} chahiye. Is shop ne pehle ${money(s.boost)} boost diya hua hai, jo count hoga, is liye sirf ${money(need)} ka farq dena hoga.` : `Top position claim karne ke liye ${money(topTotal + 1000)} chahiye (pehli dafa poori raqam).`}</p>` : `<p class="climb">🏆 Ye shop is board par #1 par hai.</p>`}
     <h3>Products (${prods.length})</h3>
     ${prodHtml}
