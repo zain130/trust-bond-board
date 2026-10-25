@@ -61,7 +61,10 @@
 <script>
 const pre = param("shop");
 function fillShops(){
-  document.getElementById("m-shop").innerHTML = SHOPS.map(s => `<option value="${s.id}" ${s.id===pre?"selected":""}>${s.name} (${catBySlug(s.cat).name})</option>`).join("");
+  const sel = document.getElementById("m-shop");
+  const prev = sel.value;
+  sel.innerHTML = SHOPS.map(s => `<option value="${s.id}" ${s.id===pre?"selected":""}>${s.name} (${catBySlug(s.cat).name})</option>`).join("");
+  if(prev && SHOPS.find(s => s.id === prev)) sel.value = prev;
 }
 fillShops();
 loadLiveShops().then(fillShops);
