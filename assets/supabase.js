@@ -21,7 +21,8 @@ async function fetchLiveShops(){
     return rows.map(s => ({
       id: s.id, name: s.name, cat: s.cat, tag: s.tag || "", city: s.city || "",
       handle: s.handle || "", bond: s.bond || 0, boost: s.boost || 0,
-      orders: s.orders || 0, desc: s.description || "", pin: s.manage_pin || ""
+      orders: s.orders || 0, desc: s.description || "", pin: s.manage_pin || "",
+      bondVerified: s.bond_verified === true
     }));
   } catch(e){ return null; }
 }
