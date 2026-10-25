@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Category Board — Trust Bond Board</title>
-<link rel="stylesheet" href="assets/style.css?v=2">
+<link rel="stylesheet" href="assets/style.css?v=3">
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -45,7 +45,7 @@ if(!cat){
       <h3><a href="shop.html?id=${s.id}">${s.name}</a></h3>
       <p>${s.tag} · ${s.city} · ${s.handle} · ${s.orders} orders served</p>
       <p>${s.desc}</p>
-      <p><span class="badge">Trust Bond ${money(s.bond)}</span> <span class="badge goldb">Boost ${money(s.boost)}/month</span></p>
+      <p><span class="badge">Trust Bond ${money(s.bond)}</span> ${s.bondVerified ? `<span class="badge">✓ Bond Protected</span>` : ""} <span class="badge goldb">Boost ${money(s.boost)}/month</span></p>
       <div class="actions"><a class="btn" href="shop.html?id=${s.id}">View shop</a></div>
     </div></div>`).join("")
     : "<p>No shops on this board yet. Be the first — <a href='submit.html'>list your shop</a>.</p>";
