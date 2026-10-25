@@ -4,14 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Category Board — Trust Bond Board</title>
-<link rel="stylesheet" href="assets/style.css?v=4">
+<link rel="stylesheet" href="assets/style.css?v=5">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 <header class="site"><div class="wrap">
   <a class="logo" href="index.html">Trust<span>Bond</span> Board</a>
   <nav class="main">
     <a href="index.html">Home</a>
-    <a href="submit.html">List Your Shop</a>
+    <a class="cta" href="submit.html">List Your Shop</a>
     <a href="dispute.html">Complaint</a>
     <a href="rules.html">Rules</a>
   </nav>
@@ -43,14 +46,19 @@ if(!cat){
   const shops = rankedShops(slug);
   const top = shops[0];
   document.getElementById("board-climb").textContent = top ? `🏆 #1 spot: ${top.name} (Boost ${money(top.boost)}/month). Is se upar jane ke liye ${money(top.boost + 1)}/month ya zyada boost chahiye.` : "Is board par pehli shop bano!";
-  document.getElementById("board-list").innerHTML = shops.length ? shops.map((s,i) => `
-    <div class="shoprow"><div class="rank">#${i+1}</div><div>
-      <h3><a href="shop.html?id=${s.id}">${s.name}</a></h3>
-      <p>${s.tag} · ${s.city} · ${s.handle} · ${s.orders} orders served</p>
-      <p>${s.desc}</p>
-      <p><span class="badge">Trust Bond ${money(s.bond)}</span> ${s.bondVerified ? `<span class="badge">✓ Bond Protected</span>` : ""} <span class="badge goldb">Boost ${money(s.boost)}/month</span></p>
-      <div class="actions"><a class="btn" href="shop.html?id=${s.id}">View shop</a></div>
-    </div></div>`).join("")
+  document.getElementById("board-list").innerHTML = shops.length ? `
+  <div class="tablewrap"><table class="lb">
+  <thead><tr><th>Rank</th><th>Shop</th><th class="num">Trust bond</th><th class="num">Monthly boost</th><th class="num">Orders</th><th></th></tr></thead>
+  <tbody>${shops.map((s,i) => `
+    <tr>
+      <td><span class="ranknum ${i===0?"r1":i===1?"r2":i===2?"r3":""}">#${i+1}</span></td>
+      <td><div class="shopcell"><div class="miniavatar">${s.name.charAt(0).toUpperCase()}</div><div><a href="shop.html?id=${s.id}">${s.name}</a><span>${s.tag} · ${s.city} · ${s.handle}</span></div></div></td>
+      <td class="num"><b>${money(s.bond)}</b>${s.bondVerified ? ` <span class="badge">✓ Bond Protected</span>` : ""}</td>
+      <td class="num"><b>${money(s.boost)}</b></td>
+      <td class="num">${s.orders}</td>
+      <td><a class="btn small" href="shop.html?id=${s.id}">View shop</a></td>
+    </tr>`).join("")}</tbody>
+  </table></div>`
     : "<p>No shops on this board yet. Be the first — <a href='submit.html'>list your shop</a>.</p>";
 }
 }
