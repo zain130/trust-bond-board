@@ -82,3 +82,15 @@ async function deleteProduct(id){
     return r.ok;
   } catch(e){ return false; }
 }
+
+/* Updates a product by id. Returns the row or null. */
+async function updateProduct(id, patch){
+  try {
+    const r = await fetch(SUPABASE_URL + "/rest/v1/products?id=eq." + encodeURIComponent(id), {
+      method: "PATCH", headers: SB_HEADERS, body: JSON.stringify(patch)
+    });
+    if(!r.ok) return null;
+    const rows = await r.json();
+    return rows[0] || null;
+  } catch(e){ return null; }
+}

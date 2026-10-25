@@ -123,3 +123,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green);b
 .grid .card:hover h3{color:var(--green)}
 .grid .card:hover .icon{transform:scale(1.06) rotate(-2deg)}
 .grid .card:hover::after{transform:translateX(4px)}
+
+/* ---- Climb banner + search ---- */
+.climb{background:#fdf6dd;border:1px solid #eed98d;color:#7a5f00;padding:10px 14px;border-radius:10px;font-size:14px;margin:12px 0}
+.searchbox{margin:4px 0 16px}
