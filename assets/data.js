@@ -14,7 +14,7 @@ const CATEGORIES = [
   {slug:"automotive-motorbike", name:"Automotive & Motorbike", icon:"🏍️", subs:["Automotive","Motorcycle","Loaders & Rickshaw"]}
 ];
 
-/* bond = refundable trust deposit (amanat). boost = monthly, non-refundable rank bid.
+/* bond = refundable trust deposit (amanat). boost = lifetime cumulative total paid, non-refundable.
    Rank inside a category = boost desc, then bond desc. */
 const DEMO_SHOPS = [
   {id:"chicbags", name:"ChicBags", cat:"watches-bags-jewellery", tag:"Womens Bags", city:"Lahore", handle:"@chicbags", bond:10000, boost:5000, orders:120, desc:"Handbags, clutches and totes. COD available nationwide."},
