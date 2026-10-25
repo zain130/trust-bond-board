@@ -31,22 +31,49 @@
     <br><button class="btn" type="submit">Submit complaint</button>
   </form>
   <div class="success" id="dispute-ok">
-    <b>Complaint received (demo).</b> Your reference number is <b id="d-ref"></b>.
-    In the live version, the seller has 7 days to resolve this. If they do not, your refund comes from their trust bond.
+    <b>Complaint received.</b> Your reference number is <b id="d-ref"></b>.
+    The seller has 7 days to resolve this. If they do not, your refund comes from their trust bond.
+  </div>
+  <div class="success" id="dispute-err" style="display:none">
+    <b>Submit nahi hua.</b> Internet connection check kar ke dobara try karen. Agar masla barqarar rahe to thodi der baad phir koshish karen.
   </div>
 </div>
 <footer class="site"><div class="wrap">
   False complaints are removed and repeat false filers are blocked. Keep your payment receipt and chat screenshots ready.
 </div></footer>
+<script src="assets/supabase.js"></script>
 <script src="assets/data.js"></script>
 <script>
 const pre = param("shop");
-document.getElementById("d-shop").innerHTML = SHOPS.map(s => `<option value="${s.id}" ${s.id===pre?"selected":""}>${s.name} (${catBySlug(s.cat).name})</option>`).join("");
-document.getElementById("dispute-form").addEventListener("submit", function(e){
+function renderShops(){
+  document.getElementById("d-shop").innerHTML = SHOPS.map(s => `<option value="${s.id}" ${s.id===pre?"selected":""}>${s.name} (${catBySlug(s.cat).name})</option>`).join("");
+}
+renderShops();
+loadLiveShops().then(renderShops);
+document.getElementById("dispute-form").addEventListener("submit", async function(e){
   e.preventDefault();
-  document.getElementById("d-ref").textContent = "TBB-D-" + Math.floor(1000 + Math.random()*9000);
-  document.getElementById("dispute-ok").style.display = "block";
-  window.scrollTo(0, document.getElementById("dispute-ok").offsetTop - 80);
+  const btn = e.target.querySelector("button[type=submit]");
+  btn.disabled = true;
+  btn.textContent = "Submitting...";
+  document.getElementById("dispute-err").style.display = "none";
+  const ref = "TBB-D-" + Date.now().toString(36).toUpperCase();
+  const row = await submitDisputeRecord({
+    id: ref,
+    shop_id: document.getElementById("d-shop").value,
+    buyer_whatsapp: document.getElementById("d-wa").value.trim(),
+    amount: parseInt(document.getElementById("d-amt").value, 10),
+    detail: document.getElementById("d-issue").value.trim()
+  });
+  btn.disabled = false;
+  btn.textContent = "Submit complaint";
+  if(row){
+    document.getElementById("d-ref").textContent = ref;
+    document.getElementById("dispute-ok").style.display = "block";
+    window.scrollTo(0, document.getElementById("dispute-ok").offsetTop - 80);
+  } else {
+    document.getElementById("dispute-err").style.display = "block";
+    window.scrollTo(0, document.getElementById("dispute-err").offsetTop - 80);
+  }
 });
 </script>
 </body>

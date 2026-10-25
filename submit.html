@@ -28,6 +28,8 @@
     <input required id="f-link" placeholder="https://instagram.com/yourshop">
     <label>WhatsApp number (03xx-xxxxxxx)</label>
     <input required id="f-wa" placeholder="03xx-xxxxxxx">
+    <label>City</label>
+    <input id="f-city" placeholder="e.g. Lahore">
     <label>Trust bond amount (Rs)</label>
     <select id="f-bond">
       <option value="2000">Rs 2,000</option>
@@ -40,21 +42,45 @@
     <br><button class="btn" type="submit">Submit for verification</button>
   </form>
   <div class="success" id="submit-ok">
-    <b>Request received (demo).</b> Your reference number is <b id="ref-no"></b>.
-    In the live version, admin will contact you on WhatsApp to verify your bond payment, then your shop goes live on its board.
+    <b>Request received.</b> Your reference number is <b id="ref-no"></b>.
+    Admin will contact you on WhatsApp to verify your bond payment, then your shop goes live on its board.
+  </div>
+  <div class="success" id="submit-err" style="display:none">
+    <b>Submit nahi hua.</b> Internet connection check kar ke dobara try karen. Agar masla barqarar rahe to thodi der baad phir koshish karen.
   </div>
 </div>
 <footer class="site"><div class="wrap">
   Bond money is amanat: refundable on clean exit minus a 10% platform fee. One-time verification fee Rs 500–1,000 applies on approval.
 </div></footer>
+<script src="assets/supabase.js"></script>
 <script src="assets/data.js"></script>
 <script>
 document.getElementById("f-cat").innerHTML = CATEGORIES.map(c => `<option value="${c.slug}">${c.name}</option>`).join("");
-document.getElementById("submit-form").addEventListener("submit", function(e){
+document.getElementById("submit-form").addEventListener("submit", async function(e){
   e.preventDefault();
-  document.getElementById("ref-no").textContent = "TBB-" + Math.floor(1000 + Math.random()*9000);
-  document.getElementById("submit-ok").style.display = "block";
-  window.scrollTo(0, document.getElementById("submit-ok").offsetTop - 80);
+  const btn = e.target.querySelector("button[type=submit]");
+  btn.disabled = true;
+  btn.textContent = "Submitting...";
+  document.getElementById("submit-err").style.display = "none";
+  const row = await submitShopListing({
+    name: document.getElementById("f-name").value.trim(),
+    cat: document.getElementById("f-cat").value,
+    handle: document.getElementById("f-link").value.trim(),
+    whatsapp: document.getElementById("f-wa").value.trim(),
+    city: document.getElementById("f-city").value.trim() || null,
+    bond: parseInt(document.getElementById("f-bond").value, 10),
+    description: document.getElementById("f-desc").value.trim()
+  });
+  btn.disabled = false;
+  btn.textContent = "Submit for verification";
+  if(row){
+    document.getElementById("ref-no").textContent = "TBB-" + String(row.id).slice(0, 8).toUpperCase();
+    document.getElementById("submit-ok").style.display = "block";
+    window.scrollTo(0, document.getElementById("submit-ok").offsetTop - 80);
+  } else {
+    document.getElementById("submit-err").style.display = "block";
+    window.scrollTo(0, document.getElementById("submit-err").offsetTop - 80);
+  }
 });
 </script>
 </body>

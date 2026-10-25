@@ -48,8 +48,10 @@
 <footer class="site"><div class="wrap">
   Trust Bond Board v0 (demo). Bond money is held as amanat and is refundable on clean exit minus a 10% platform fee. Boost bids are monthly and non-refundable. Paid ranks are always labelled.
 </div></footer>
+<script src="assets/supabase.js"></script>
 <script src="assets/data.js"></script>
 <script>
+function render(){
 document.getElementById("c-shops").textContent = SHOPS.length;
 document.getElementById("c-bond").textContent = money(SHOPS.reduce((s,x)=>s+x.bond,0));
 document.getElementById("cat-grid").innerHTML = CATEGORIES.map(c => {
@@ -63,6 +65,9 @@ document.getElementById("top-shops").innerHTML = top.map((s,i) => `
     <p>${catBySlug(s.cat).name} · ${s.tag} · ${s.city}</p>
     <p><span class="badge">Trust Bond ${money(s.bond)}</span> <span class="badge goldb">Boost ${money(s.boost)}/month</span></p>
   </div></div>`).join("");
+}
+render();
+loadLiveShops().then(render);
 </script>
 </body>
 </html>

@@ -26,8 +26,10 @@
 <footer class="site"><div class="wrap">
   Rank = monthly boost bid (non-refundable). Bond = refundable trust deposit shown on every shop. Sponsored ranks are labelled.
 </div></footer>
+<script src="assets/supabase.js"></script>
 <script src="assets/data.js"></script>
 <script>
+function render(){
 const slug = param("cat");
 const cat = catBySlug(slug);
 if(!cat){
@@ -48,6 +50,9 @@ if(!cat){
     </div></div>`).join("")
     : "<p>No shops on this board yet. Be the first — <a href='submit.html'>list your shop</a>.</p>";
 }
+}
+render();
+loadLiveShops().then(render);
 </script>
 </body>
 </html>

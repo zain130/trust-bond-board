@@ -23,8 +23,10 @@
 <footer class="site"><div class="wrap">
   If this shop does not deliver or sends the wrong item, file a complaint within 7 days and the bond covers your refund.
 </div></footer>
+<script src="assets/supabase.js"></script>
 <script src="assets/data.js"></script>
 <script>
+function render(){
 const id = param("id");
 const s = SHOPS.find(x => x.id === id);
 if(!s){
@@ -47,6 +49,9 @@ if(!s){
        <a class="btn ghost" href="board.html?cat=${s.cat}">Back to ${cat.name} board</a></p>
     <p style="color:var(--muted);font-size:14px">Demo listing: WhatsApp ordering activates when the real shop joins with a verified bond.</p>`;
 }
+}
+render();
+loadLiveShops().then(render);
 </script>
 </body>
 </html>
