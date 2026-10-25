@@ -24,8 +24,8 @@
     <input required id="f-name" placeholder="e.g. ChicBags">
     <label>Category board</label>
     <select id="f-cat"></select>
-    <label>Instagram / Facebook link</label>
-    <input required id="f-link" placeholder="https://instagram.com/yourshop">
+    <label>Shop ka link (Instagram / Facebook / Website) — agar ho to, warna khali chhor den</label>
+    <input id="f-link" placeholder="https://instagram.com/yourshop">
     <label>WhatsApp number (03xx-xxxxxxx)</label>
     <input required id="f-wa" placeholder="03xx-xxxxxxx">
     <label>City</label>
@@ -65,7 +65,7 @@ document.getElementById("submit-form").addEventListener("submit", async function
   const row = await submitShopListing({
     name: document.getElementById("f-name").value.trim(),
     cat: document.getElementById("f-cat").value,
-    handle: document.getElementById("f-link").value.trim(),
+    handle: document.getElementById("f-link").value.trim() || null,
     whatsapp: document.getElementById("f-wa").value.trim(),
     city: document.getElementById("f-city").value.trim() || null,
     bond: parseInt(document.getElementById("f-bond").value, 10),
