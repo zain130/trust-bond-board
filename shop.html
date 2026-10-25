@@ -48,7 +48,7 @@ if(!s){
   document.title = s.name + " — Trust Bond Board";
   document.getElementById("shop-box").innerHTML = `
     <h2>${s.name} <span class="badge">Bond Protected</span></h2>
-    <p style="color:var(--muted)">${cat.name} · ${s.tag} · ${s.city} · ${s.handle}</p>
+    <p style="color:var(--muted)">${[cat.name, s.tag, s.city, s.handle].filter(x => x).join(" · ")}</p>
     <p>${s.desc}</p>
     <div class="counters">
       <div class="stat"><b>#${rank}</b><span>Rank in ${cat.name}</span></div>
