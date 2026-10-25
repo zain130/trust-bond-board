@@ -76,3 +76,37 @@ footer.site{margin-top:36px;padding:20px 0;color:var(--muted);font-size:13px;bor
   .shoprow{flex-direction:column}
   .rank{min-width:0}
 }
+
+/* ---- Smooth look + animations (design polish) ---- */
+html{scroll-behavior:smooth}
+body{-webkit-font-smoothing:antialiased;animation:pageIn .5s ease both}
+a{transition:color .2s ease}
+header.site{box-shadow:0 2px 12px rgba(15,42,61,.18)}
+@keyframes pageIn{from{opacity:0}to{opacity:1}}
+@keyframes riseIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.hero{animation:riseIn .6s ease both}
+.hero h1{animation:riseIn .6s .08s ease both}
+.hero p{animation:riseIn .6s .16s ease both}
+.hero .btn{animation:riseIn .6s .24s ease both}
+.shop-hero{animation:riseIn .6s ease both}
+.card,.pcard,.shoprow,.step,.stat{box-shadow:0 1px 3px rgba(15,42,61,.06);animation:riseIn .55s cubic-bezier(.22,.61,.36,1) both}
+.grid > :nth-child(2),.counters > :nth-child(2),#top-shops > :nth-child(2),#board-list > :nth-child(2){animation-delay:.07s}
+.grid > :nth-child(3),.counters > :nth-child(3),#top-shops > :nth-child(3),#board-list > :nth-child(3){animation-delay:.14s}
+.grid > :nth-child(4),.counters > :nth-child(4),#top-shops > :nth-child(4),#board-list > :nth-child(4){animation-delay:.21s}
+.grid > :nth-child(5),#top-shops > :nth-child(5),#board-list > :nth-child(5){animation-delay:.28s}
+.grid > :nth-child(6),#top-shops > :nth-child(6),#board-list > :nth-child(6){animation-delay:.35s}
+.card,.pcard{transition:transform .25s ease, box-shadow .25s ease}
+.card:hover,.pcard:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(15,42,61,.14)}
+.pimg img{transition:transform .5s ease}
+.pcard:hover .pimg img{transform:scale(1.06)}
+.btn{transition:transform .2s ease, box-shadow .2s ease, opacity .2s ease}
+.btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(14,122,91,.25)}
+.btn:active{transform:translateY(0) scale(.98)}
+nav.main a{position:relative;transition:color .2s ease}
+nav.main a::after{content:"";position:absolute;left:0;bottom:-4px;height:2px;width:100%;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .25s ease}
+nav.main a:hover::after{transform:scaleX(1)}
+input,select,textarea{transition:border-color .2s ease, box-shadow .2s ease}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(14,122,91,.15)}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-delay:0s !important;transition-duration:.01ms !important;scroll-behavior:auto !important}
+}
