@@ -164,3 +164,6 @@ footer.site .wrap{max-width:1120px}
   *{scroll-behavior:auto!important}
   .grid .card,.pcard{transition:none}
 }
+
+/* ---- Logo ---- */
+.logo img{height:38px;width:auto;display:block}
