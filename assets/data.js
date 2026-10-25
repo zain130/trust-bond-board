@@ -1,4 +1,4 @@
-/* Trust Bond Board v0 — seed data (DEMO listings, not real sellers) */
+/* ShoppingOye v0 — seed data (DEMO listings, not real sellers) */
 const CATEGORIES = [
   {slug:"electronic-accessories", name:"Electronic Accessories", icon:"🎧", subs:["Mobile Accessories","Headphones & Headsets","Computer Accessories","Gaming Accessories","Wearable","Storage"]},
   {slug:"tv-home-appliances", name:"TV & Home Appliances", icon:"📺", subs:["Kitchen Appliances","Home Audio & Theater","Televisions","Air Conditioner","Washing Machine"]},

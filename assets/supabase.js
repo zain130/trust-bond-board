@@ -1,4 +1,4 @@
-/* Trust Bond Board — Supabase client (phase 2).
+/* ShoppingOye — Supabase client (phase 2).
    The anon key below is PUBLIC by design: Supabase anon keys ship in browser code.
    Row Level Security limits what it can do: read approved shops, insert submissions
    and disputes. Never put the service_role key in browser code. */
