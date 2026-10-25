@@ -1,0 +1,62 @@
+/* Trust Bond Board v0 — mobile-first, static */
+:root{
+  --navy:#0f2a3d; --green:#0e7a5b; --gold:#c9a227; --wa:#25d366;
+  --bg:#f4f7f6; --card:#ffffff; --text:#1c2b33; --muted:#5c6b76; --line:#dde6e2;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;background:var(--bg);color:var(--text)}
+a{color:var(--green);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:1060px;margin:0 auto;padding:0 16px}
+header.site{background:var(--navy);color:#fff;position:sticky;top:0;z-index:10}
+header.site .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px}
+.logo{font-weight:800;font-size:20px;color:#fff;letter-spacing:.2px}
+.logo span{color:var(--gold)}
+nav.main{display:flex;gap:14px;flex-wrap:wrap;font-size:14px}
+nav.main a{color:#d7e3dd}
+nav.main a:hover{color:#fff}
+.demo{background:#fff4d6;border:1px solid #f0d67a;color:#6b5410;padding:10px 14px;border-radius:10px;font-size:14px;margin:16px 0}
+.hero{background:linear-gradient(135deg,#0f2a3d,#0e7a5b);color:#fff;border-radius:16px;padding:28px 22px;margin:20px 0}
+.hero h1{margin:0 0 8px;font-size:30px;line-height:1.2}
+.hero p{margin:0 0 16px;color:#d7e3dd;font-size:16px;max-width:640px}
+.btn{display:inline-block;background:var(--green);color:#fff;padding:11px 18px;border-radius:999px;font-weight:700;border:0;cursor:pointer}
+.btn:hover{text-decoration:none;opacity:.92}
+.btn.gold{background:var(--gold);color:#231f05}
+.btn.wa{background:var(--wa);color:#062b16}
+.btn.ghost{background:#fff;color:var(--navy);border:1px solid var(--line)}
+.counters{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;text-align:center}
+.stat b{display:block;font-size:26px;color:var(--navy)}
+.stat span{color:var(--muted);font-size:13px}
+h2{font-size:22px;margin:26px 0 12px;color:var(--navy)}
+h3{margin:0 0 6px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.card .icon{font-size:26px}
+.card h3{font-size:17px;margin:6px 0}
+.card p{margin:0;color:var(--muted);font-size:14px}
+.badge{display:inline-block;background:#e6f4ee;color:var(--green);border:1px solid #bfe3d4;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:700}
+.badge.goldb{background:#fdf6dd;color:#7a5f00;border-color:#eed98d}
+.shoprow{display:flex;gap:14px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:0 0 12px}
+.rank{font-size:26px;font-weight:800;color:var(--gold);min-width:44px}
+.shoprow h3{font-size:18px}
+.shoprow p{margin:4px 0;color:var(--muted);font-size:14px}
+.shoprow .actions{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.step{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.step b{font-size:22px;color:var(--green)}
+label{display:block;font-weight:700;margin:14px 0 6px}
+input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font-size:15px;font-family:inherit;background:#fff}
+textarea{min-height:90px}
+.success{display:none;background:#e6f4ee;border:1px solid #bfe3d4;border-radius:12px;padding:16px;margin-top:16px}
+.success b{color:var(--green)}
+table.rules{width:100%;border-collapse:collapse;background:var(--card)}
+table.rules td,table.rules th{border:1px solid var(--line);padding:10px;text-align:left;font-size:14px}
+footer.site{margin-top:36px;padding:20px 0;color:var(--muted);font-size:13px;border-top:1px solid var(--line)}
+@media(max-width:720px){
+  .grid,.steps{grid-template-columns:1fr}
+  .counters{grid-template-columns:1fr 1fr}
+  .hero h1{font-size:24px}
+  .shoprow{flex-direction:column}
+  .rank{min-width:0}
+}
