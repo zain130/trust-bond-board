@@ -21,7 +21,7 @@ async function fetchLiveShops(){
     return rows.map(s => ({
       id: s.id, name: s.name, cat: s.cat, tag: s.tag || "", city: s.city || "",
       handle: s.handle || "", bond: s.bond || 0, boost: s.boost || 0,
-      orders: s.orders || 0, desc: s.description || ""
+      orders: s.orders || 0, desc: s.description || "", pin: s.manage_pin || ""
     }));
   } catch(e){ return null; }
 }
@@ -56,6 +56,28 @@ async function fetchLiveProducts(){
     const r = await fetch(SUPABASE_URL + "/rest/v1/products?select=*&order=price.asc", { headers: SB_HEADERS });
     if(!r.ok) return null;
     const rows = await r.json();
-    return rows.map(p => ({ id: p.id, shop: p.shop_id, name: p.name, price: p.price, tag: p.tag || "" }));
+    return rows.map(p => ({ id: p.id, shop: p.shop_id, name: p.name, price: p.price, tag: p.tag || "", img: p.image_url || "" }));
   } catch(e){ return null; }
+}
+
+/* Adds a product (seller management). Returns the row or null. */
+async function addProduct(d){
+  try {
+    const r = await fetch(SUPABASE_URL + "/rest/v1/products", {
+      method: "POST", headers: SB_HEADERS, body: JSON.stringify(d)
+    });
+    if(!r.ok) return null;
+    const rows = await r.json();
+    return rows[0] || null;
+  } catch(e){ return null; }
+}
+
+/* Deletes a product by id. Returns true on success. */
+async function deleteProduct(id){
+  try {
+    const r = await fetch(SUPABASE_URL + "/rest/v1/products?id=eq." + encodeURIComponent(id), {
+      method: "DELETE", headers: SB_HEADERS
+    });
+    return r.ok;
+  } catch(e){ return false; }
 }
