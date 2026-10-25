@@ -38,9 +38,56 @@ let SHOPS = DEMO_SHOPS.slice();
 
 async function loadLiveShops(){
   const live = await fetchLiveShops();
-  if(live){ SHOPS = live; return true; }
-  return false;
+  const liveProducts = await fetchLiveProducts();
+  if(live){ SHOPS = live; }
+  if(liveProducts){ PRODUCTS = liveProducts; }
+  return !!(live || liveProducts);
 }
+
+/* Dummy products for the 12 seed shops (3 per shop). Live products from
+   Supabase replace these when loadLiveShops() succeeds. */
+const DEMO_PRODUCTS = [
+  {id:"chicbags-1", shop:"chicbags", name:"Leather Tote Bag", price:3500, tag:"Tote Bags"},
+  {id:"chicbags-2", shop:"chicbags", name:"Party Clutch", price:2200, tag:"Clutches"},
+  {id:"chicbags-3", shop:"chicbags", name:"Canvas Shoulder Bag", price:1800, tag:"Shoulder Bags"},
+  {id:"lawnhouse-1", shop:"lawnhouse", name:"Embroidered Lawn 3-Piece", price:4500, tag:"Lawn Suits"},
+  {id:"lawnhouse-2", shop:"lawnhouse", name:"Printed Lawn 2-Piece", price:2800, tag:"Lawn Suits"},
+  {id:"lawnhouse-3", shop:"lawnhouse", name:"Luxury Chiffon Suit", price:6500, tag:"Formal Wear"},
+  {id:"glowskin-1", shop:"glowskin", name:"Vitamin C Serum", price:2400, tag:"Serums"},
+  {id:"glowskin-2", shop:"glowskin", name:"Hydrating Face Wash", price:1200, tag:"Face Wash"},
+  {id:"glowskin-3", shop:"glowskin", name:"Night Repair Cream", price:3000, tag:"Moisturizers"},
+  {id:"juttipoint-1", shop:"juttipoint", name:"Handmade Leather Khussa", price:2500, tag:"Khussay"},
+  {id:"juttipoint-2", shop:"juttipoint", name:"Embroidered Jutti", price:2000, tag:"Juttis"},
+  {id:"juttipoint-3", shop:"juttipoint", name:"Bridal Khussa Set", price:4200, tag:"Bridal"},
+  {id:"silvernest-1", shop:"silvernest", name:"925 Silver Ring", price:5500, tag:"Rings"},
+  {id:"silvernest-2", shop:"silvernest", name:"Silver Pendant Set", price:7800, tag:"Pendant Sets"},
+  {id:"silvernest-3", shop:"silvernest", name:"Silver Bangles Pair", price:6200, tag:"Bangles"},
+  {id:"menkurta-1", shop:"menkurta", name:"Stitched Cotton Kurta", price:3200, tag:"Stitched Kurtas"},
+  {id:"menkurta-2", shop:"menkurta", name:"Unstitched Kurta Fabric", price:2400, tag:"Unstitched Fabric"},
+  {id:"menkurta-3", shop:"menkurta", name:"Premium Boski Kurta", price:5000, tag:"Premium Wear"},
+  {id:"babybloom-1", shop:"babybloom", name:"Cotton Baby Romper Set", price:1500, tag:"Rompers"},
+  {id:"babybloom-2", shop:"babybloom", name:"Newborn Gift Box", price:3500, tag:"Gift Sets"},
+  {id:"babybloom-3", shop:"babybloom", name:"Winter Baby Suit", price:2200, tag:"Winter Wear"},
+  {id:"decornest-1", shop:"decornest", name:"Handmade Table Lamp", price:4800, tag:"Lamps"},
+  {id:"decornest-2", shop:"decornest", name:"Wall Art Frame Set", price:3600, tag:"Wall Art"},
+  {id:"decornest-3", shop:"decornest", name:"Ceramic Vase", price:2400, tag:"Vases"},
+  {id:"mobilecare-1", shop:"mobilecare", name:"Fast Charging Cable", price:800, tag:"Cables"},
+  {id:"mobilecare-2", shop:"mobilecare", name:"Leather Phone Cover", price:1200, tag:"Covers"},
+  {id:"mobilecare-3", shop:"mobilecare", name:"20W Fast Charger", price:1500, tag:"Chargers"},
+  {id:"fitfuel-1", shop:"fitfuel", name:"Imported Whey Protein 2lb", price:12500, tag:"Whey Protein"},
+  {id:"fitfuel-2", shop:"fitfuel", name:"Creatine Monohydrate", price:6800, tag:"Creatine"},
+  {id:"fitfuel-3", shop:"fitfuel", name:"Pre-Workout", price:5500, tag:"Pre-Workout"},
+  {id:"shinemakeup-1", shop:"shinemakeup", name:"Matte Lipstick Set", price:2000, tag:"Lipsticks"},
+  {id:"shinemakeup-2", shop:"shinemakeup", name:"Foundation + Blender Kit", price:3400, tag:"Face Makeup"},
+  {id:"shinemakeup-3", shop:"shinemakeup", name:"Eyeshadow Palette", price:2800, tag:"Eye Makeup"},
+  {id:"watchzone-1", shop:"watchzone", name:"Chronograph Watch", price:9500, tag:"Chronographs"},
+  {id:"watchzone-2", shop:"watchzone", name:"Leather Strap Watch", price:7200, tag:"Leather Strap"},
+  {id:"watchzone-3", shop:"watchzone", name:"Steel Bracelet Watch", price:11000, tag:"Steel Bracelet"}
+];
+
+let PRODUCTS = DEMO_PRODUCTS.slice();
+
+function productsForShop(shopId){ return PRODUCTS.filter(p => p.shop === shopId); }
 
 function catBySlug(slug){ return CATEGORIES.find(c => c.slug === slug); }
 function rankedShops(catSlug){

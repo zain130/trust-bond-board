@@ -49,3 +49,13 @@ async function submitDisputeRecord(d){
     return rows[0] || null;
   } catch(e){ return null; }
 }
+
+/* Returns all products, or null on any failure (caller keeps demo fallback). */
+async function fetchLiveProducts(){
+  try {
+    const r = await fetch(SUPABASE_URL + "/rest/v1/products?select=*&order=price.asc", { headers: SB_HEADERS });
+    if(!r.ok) return null;
+    const rows = await r.json();
+    return rows.map(p => ({ id: p.id, shop: p.shop_id, name: p.name, price: p.price, tag: p.tag || "" }));
+  } catch(e){ return null; }
+}

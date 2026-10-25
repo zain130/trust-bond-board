@@ -52,6 +52,11 @@ textarea{min-height:90px}
 .success b{color:var(--green)}
 table.rules{width:100%;border-collapse:collapse;background:var(--card)}
 table.rules td,table.rules th{border:1px solid var(--line);padding:10px;text-align:left;font-size:14px}
+.pcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.pcard h3{font-size:17px}
+.pcard .price{font-size:20px;font-weight:800;color:var(--navy);margin:8px 0}
+.pcard p{margin:4px 0;color:var(--muted);font-size:14px}
+.pcard .actions{margin-top:10px}
 footer.site{margin-top:36px;padding:20px 0;color:var(--muted);font-size:13px;border-top:1px solid var(--line)}
 @media(max-width:720px){
   .grid,.steps{grid-template-columns:1fr}
