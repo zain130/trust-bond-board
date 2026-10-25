@@ -28,7 +28,7 @@
   <p><a class="btn" href="submit.html">Is board par apni shop list karen</a></p>
 </div>
 <footer class="site"><div class="wrap">
-  Rank = monthly boost bid (non-refundable). Bond = refundable trust deposit shown on every shop. Sponsored ranks are labelled.
+  Rank = total boost paid (cumulative, non-refundable). Top claim = current top + Rs 1,000. Bond = refundable trust deposit shown on every shop. Sponsored ranks are labelled.
 </div></footer>
 <script src="assets/supabase.js"></script>
 <script src="assets/data.js"></script>
@@ -45,10 +45,10 @@ if(!cat){
   document.getElementById("board-sub").textContent = "Subcategories: " + cat.subs.join(" · ");
   const shops = rankedShops(slug);
   const top = shops[0];
-  document.getElementById("board-climb").textContent = top ? `🏆 #1 spot: ${top.name} (Boost ${money(top.boost)}/month). Is se upar jane ke liye ${money(top.boost + 1)}/month ya zyada boost chahiye.` : "Is board par pehli shop bano!";
+  document.getElementById("board-climb").textContent = top ? `🏆 Claim the top position in the leaderboard for ${money(top.boost + 1000)}. Pehli dafa top lene wale ko poori raqam deni hogi. Jis shop ne pehle boost diya hua hai, us ki pehli raqam count hogi, sirf farq dena hoga.` : "Is board par pehli shop bano!";
   document.getElementById("board-list").innerHTML = shops.length ? `
   <div class="tablewrap"><table class="lb">
-  <thead><tr><th>Rank</th><th>Shop</th><th class="num">Trust bond</th><th class="num">Monthly boost</th><th class="num">Orders</th><th></th></tr></thead>
+  <thead><tr><th>Rank</th><th>Shop</th><th class="num">Trust bond</th><th class="num">Total boost paid</th><th class="num">Orders</th><th></th></tr></thead>
   <tbody>${shops.map((s,i) => `
     <tr>
       <td><span class="ranknum ${i===0?"r1":i===1?"r2":i===2?"r3":""}">#${i+1}</span></td>
