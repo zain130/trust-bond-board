@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Manage My Shop — Trust Bond Board</title>
-<link rel="stylesheet" href="assets/style.css?v=3">
+<link rel="stylesheet" href="assets/style.css?v=4">
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -19,6 +19,7 @@
 <div class="wrap">
   <h2>Manage my shop</h2>
   <p style="color:var(--muted)">Seller apni products yahan se add ya delete kar sakta hai. PIN admin aap ko WhatsApp par dega jab aap ki shop approve hogi.</p>
+  <div class="demo"><b>Products kaise list karen (3 steps):</b> 1) PIN se login karen. 2) Neeche form me product ka naam, price aur tasveer ka link den, Add dabayen. 3) Product foran aap ki shop page par live ho jayega. Kisi product ko badalna ho to Edit, hatana ho to Delete dabayen.</div>
 
   <div id="lock-box">
     <label>Shop</label>
@@ -31,8 +32,9 @@
 
   <div id="manage-box" style="display:none">
     <h3 id="m-title"></h3>
+    <p id="m-bond" style="color:var(--muted)"></p>
     <div id="m-list"></div>
-    <h3>Add a product</h3>
+    <h3 id="m-form-title">Add a product</h3>
     <form id="m-add">
       <label>Product name</label>
       <input required id="a-name" placeholder="e.g. Leather Tote Bag">
@@ -42,7 +44,9 @@
       <input id="a-tag" placeholder="e.g. Tote Bags">
       <label>Image URL (optional, Instagram ya kisi image ka link)</label>
       <input id="a-img" placeholder="https://...">
-      <br><button class="btn" type="submit">Add product</button>
+      <img id="a-preview" style="display:none;max-width:220px;border-radius:10px;margin-top:10px" alt="">
+      <br><button class="btn" type="submit" id="a-submit">Add product</button>
+      <button class="btn ghost" type="button" id="a-cancel" style="display:none">Cancel edit</button>
     </form>
     <p id="m-msg" style="display:none"></p>
   </div>
@@ -62,13 +66,16 @@ function fillShops(){
 fillShops();
 loadLiveShops().then(fillShops);
 let current = null;
+let editingId = null;
 function renderList(){
   const prods = productsForShop(current.id);
   document.getElementById("m-title").textContent = current.name + " — " + prods.length + " products";
+  document.getElementById("m-bond").textContent = "Trust Bond: " + money(current.bond) + (current.bondVerified ? " (✓ Verified, Bond Protected badge active)" : " (verification pending)");
   document.getElementById("m-list").innerHTML = prods.length ? prods.map(p => `
     <div class="prow">
       ${p.img ? `<img src="${p.img}" alt="${p.name}" loading="lazy" onerror="this.remove()">` : `<div style="width:64px;height:64px;min-width:64px;border-radius:8px;background:linear-gradient(135deg,#eef3f1,#dde6e2);display:flex;align-items:center;justify-content:center;font-size:26px">📦</div>`}
       <div class="grow"><b>${p.name}</b><p>${p.tag} · ${money(p.price)}</p></div>
+      <button class="btn ghost" data-edit="${p.id}">Edit</button>
       <button class="btn danger" data-del="${p.id}" data-name="${p.name}">Delete</button>
     </div>`).join("") : "<p>No products yet. Add your first product below.</p>";
   document.querySelectorAll("[data-del]").forEach(b => b.addEventListener("click", async () => {
@@ -77,7 +84,28 @@ function renderList(){
     if(ok){ await loadLiveShops(); renderList(); }
     else { alert("Delete nahi hua, dobara try karen."); }
   }));
+  document.querySelectorAll("[data-edit]").forEach(b => b.addEventListener("click", () => {
+    const p = PRODUCTS.find(x => x.id === b.dataset.edit);
+    if(!p) return;
+    editingId = p.id;
+    document.getElementById("a-name").value = p.name;
+    document.getElementById("a-price").value = p.price;
+    document.getElementById("a-tag").value = p.tag || "";
+    document.getElementById("a-img").value = p.img || "";
+    showPreview(p.img || "");
+    document.getElementById("m-form-title").textContent = "Edit product";
+    document.getElementById("a-submit").textContent = "Save changes";
+    document.getElementById("a-cancel").style.display = "inline-block";
+    window.scrollTo(0, document.getElementById("m-add").offsetTop - 80);
+  }));
 }
+function showPreview(url){
+  const img = document.getElementById("a-preview");
+  if(url){ img.src = url; img.style.display = "block"; img.onerror = () => { img.style.display = "none"; }; }
+  else { img.style.display = "none"; }
+}
+document.getElementById("a-img").addEventListener("input", (e) => showPreview(e.target.value.trim()));
+document.getElementById("a-cancel").addEventListener("click", () => resetProductForm());
 document.getElementById("m-unlock").addEventListener("click", async () => {
   await loadLiveShops();
   fillShops();
@@ -93,25 +121,34 @@ document.getElementById("m-unlock").addEventListener("click", async () => {
     document.getElementById("m-err").style.display = "block";
   }
 });
+function resetProductForm(){
+  editingId = null;
+  document.getElementById("m-add").reset();
+  showPreview("");
+  document.getElementById("m-form-title").textContent = "Add a product";
+  document.getElementById("a-submit").textContent = "Add product";
+  document.getElementById("a-cancel").style.display = "none";
+}
 document.getElementById("m-add").addEventListener("submit", async (e) => {
   e.preventDefault();
   const msg = document.getElementById("m-msg");
-  const row = await addProduct({
-    id: "p-" + Date.now().toString(36),
-    shop_id: current.id,
+  const data = {
     name: document.getElementById("a-name").value.trim(),
     price: parseInt(document.getElementById("a-price").value, 10),
     tag: document.getElementById("a-tag").value.trim() || null,
     image_url: document.getElementById("a-img").value.trim() || null
-  });
+  };
+  let row = null;
+  if(editingId){ row = await updateProduct(editingId, data); }
+  else { row = await addProduct(Object.assign({ id: "p-" + Date.now().toString(36), shop_id: current.id }, data)); }
   if(row){
-    msg.textContent = "Product add ho gaya hai.";
+    msg.textContent = editingId ? "Product update ho gaya hai." : "Product add ho gaya hai.";
     msg.style.display = "block";
-    e.target.reset();
+    resetProductForm();
     await loadLiveShops();
     renderList();
   } else {
-    msg.textContent = "Add nahi hua, dobara try karen.";
+    msg.textContent = "Save nahi hua, dobara try karen.";
     msg.style.display = "block";
   }
 });

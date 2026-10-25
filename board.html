@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Category Board — Trust Bond Board</title>
-<link rel="stylesheet" href="assets/style.css?v=3">
+<link rel="stylesheet" href="assets/style.css?v=4">
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -20,6 +20,7 @@
   <div class="demo"><b>Demo version:</b> listings below are sample data. <a href="submit.html">List your shop</a> to join the real board.</div>
   <h2 id="board-title">Board</h2>
   <p id="board-sub" style="color:var(--muted)"></p>
+  <div class="climb" id="board-climb"></div>
   <div id="board-list"></div>
   <p><a class="btn" href="submit.html">Is board par apni shop list karen</a></p>
 </div>
@@ -40,6 +41,8 @@ if(!cat){
   document.getElementById("board-title").textContent = cat.icon + " " + cat.name;
   document.getElementById("board-sub").textContent = "Subcategories: " + cat.subs.join(" · ");
   const shops = rankedShops(slug);
+  const top = shops[0];
+  document.getElementById("board-climb").textContent = top ? `🏆 #1 spot: ${top.name} (Boost ${money(top.boost)}/month). Is se upar jane ke liye ${money(top.boost + 1)}/month ya zyada boost chahiye.` : "Is board par pehli shop bano!";
   document.getElementById("board-list").innerHTML = shops.length ? shops.map((s,i) => `
     <div class="shoprow"><div class="rank">#${i+1}</div><div>
       <h3><a href="shop.html?id=${s.id}">${s.name}</a></h3>

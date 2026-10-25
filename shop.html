@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Shop — Trust Bond Board</title>
-<link rel="stylesheet" href="assets/style.css?v=3">
+<link rel="stylesheet" href="assets/style.css?v=4">
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -63,6 +63,7 @@ if(!s){
       <div class="stat"><b>${s.orders}</b><span>Orders served</span></div>
     </div>
     ${waDigits ? `<p><a class="btn wa" href="${waLink("Hi " + s.name + ", I want to order from Trust Bond Board.")}">Order on WhatsApp</a></p>` : ""}
+    ${rank > 1 ? `<p class="climb">Is se aik rank upar jane ke liye ${money(rankedShops(s.cat)[rank - 2].boost + 1)}/month boost chahiye (is shop ka boost abhi ${money(s.boost)}/month hai).</p>` : `<p class="climb">🏆 Ye shop is board par #1 par hai.</p>`}
     <h3>Products (${prods.length})</h3>
     ${prodHtml}
     <p style="margin-top:20px"><a class="btn" href="dispute.html?shop=${s.id}">File a complaint about this shop</a>

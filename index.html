@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Trust Bond Board — Pakistan ki bharosemand online shops</title>
-<link rel="stylesheet" href="assets/style.css?v=3">
+<link rel="stylesheet" href="assets/style.css?v=4">
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -33,6 +33,7 @@
   </div>
 
   <h2>Category boards</h2>
+  <input id="shop-search" class="searchbox" placeholder="Search shops ya categories... (jaise: watch, silver, lawn)">
   <div class="grid" id="cat-grid"></div>
 
   <h2>Top bonded shops (all categories)</h2>
@@ -65,7 +66,18 @@ document.getElementById("top-shops").innerHTML = top.map((s,i) => `
     <p>${catBySlug(s.cat).name} · ${s.tag} · ${s.city}</p>
     <p><span class="badge">Trust Bond ${money(s.bond)}</span> ${s.bondVerified ? `<span class="badge">✓ Bond Protected</span>` : ""} <span class="badge goldb">Boost ${money(s.boost)}/month</span></p>
   </div></div>`).join("");
+  applyFilter();
 }
+function applyFilter(){
+  const q = (document.getElementById("shop-search").value || "").toLowerCase().trim();
+  document.querySelectorAll("#cat-grid .card").forEach(el => {
+    el.style.display = (!q || el.textContent.toLowerCase().includes(q)) ? "" : "none";
+  });
+  document.querySelectorAll("#top-shops .shoprow").forEach(el => {
+    el.style.display = (!q || el.textContent.toLowerCase().includes(q)) ? "" : "none";
+  });
+}
+document.getElementById("shop-search").addEventListener("input", applyFilter);
 render();
 loadLiveShops().then(render);
 </script>
