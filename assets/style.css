@@ -83,7 +83,7 @@ body{-webkit-font-smoothing:antialiased;animation:pageIn .5s ease both}
 a{transition:color .2s ease}
 header.site{box-shadow:0 2px 12px rgba(15,42,61,.18)}
 @keyframes pageIn{from{opacity:0}to{opacity:1}}
-@keyframes riseIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes riseIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 .hero{animation:riseIn .6s ease both}
 .hero h1{animation:riseIn .6s .08s ease both}
 .hero p{animation:riseIn .6s .16s ease both}
@@ -102,11 +102,23 @@ header.site{box-shadow:0 2px 12px rgba(15,42,61,.18)}
 .btn{transition:transform .2s ease, box-shadow .2s ease, opacity .2s ease}
 .btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(14,122,91,.25)}
 .btn:active{transform:translateY(0) scale(.98)}
-nav.main a{position:relative;transition:color .2s ease}
-nav.main a::after{content:"";position:absolute;left:0;bottom:-4px;height:2px;width:100%;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .25s ease}
-nav.main a:hover::after{transform:scaleX(1)}
+nav.main a{transition:color .2s ease}
 input,select,textarea{transition:border-color .2s ease, box-shadow .2s ease}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(14,122,91,.15)}
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.01ms !important;animation-delay:0s !important;transition-duration:.01ms !important;scroll-behavior:auto !important}
 }
+
+/* ---- Category cards redesign (visible) ---- */
+.grid a:hover{text-decoration:none}
+.grid .card{position:relative;padding:22px 20px 48px;overflow:hidden;border:1px solid var(--line)}
+.grid .card .icon{width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#0f2a3d,#0e7a5b);color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:14px;transition:transform .3s ease}
+.grid .card:nth-child(3n+2) .icon{background:linear-gradient(135deg,#7a5f00,#c9a227)}
+.grid .card:nth-child(3n+3) .icon{background:linear-gradient(135deg,#0e7a5b,#2fb58a)}
+.grid .card h3{font-size:19px;margin:0 0 6px}
+.grid .card p{font-size:14px;line-height:1.5}
+.grid .card::after{content:"View board →";position:absolute;left:20px;bottom:14px;font-weight:700;color:var(--green);font-size:14px;transition:transform .25s ease}
+.grid .card:hover{transform:translateY(-6px);box-shadow:0 16px 32px rgba(15,42,61,.16);border-color:#bfe3d4}
+.grid .card:hover h3{color:var(--green)}
+.grid .card:hover .icon{transform:scale(1.06) rotate(-2deg)}
+.grid .card:hover::after{transform:translateX(4px)}
