@@ -34,20 +34,34 @@ if(!s){
 } else {
   const cat = catBySlug(s.cat);
   const rank = rankedShops(s.cat).findIndex(x => x.id === s.id) + 1;
+  const waDigits = (s.whatsapp || "").replace(/[^0-9]/g, "");
+  const waLink = (text) => "https://wa.me/" + waDigits + "?text=" + encodeURIComponent(text);
+  const prods = productsForShop(s.id);
+  const prodHtml = prods.length ? `<div class="grid">${prods.map(p => `
+    <div class="pcard">
+      <h3>${p.name}</h3>
+      <p>${p.tag}</p>
+      <div class="price">${money(p.price)}</div>
+      ${waDigits ? `<div class="actions"><a class="btn wa" href="${waLink("Hi, I want to order " + p.name + " (" + money(p.price) + ") from " + s.name + ".")}">Order this</a></div>` : `<p style="font-size:13px">Order ke liye shop ka WhatsApp jald aa raha hai.</p>`}
+    </div>`).join("")}</div>`
+    : "<p>No products listed yet.</p>";
   document.title = s.name + " — Trust Bond Board";
   document.getElementById("shop-box").innerHTML = `
-    <h2>${s.name}</h2>
+    <h2>${s.name} <span class="badge">Bond Protected</span></h2>
     <p style="color:var(--muted)">${cat.name} · ${s.tag} · ${s.city} · ${s.handle}</p>
     <p>${s.desc}</p>
     <div class="counters">
       <div class="stat"><b>#${rank}</b><span>Rank in ${cat.name}</span></div>
       <div class="stat"><b>${money(s.bond)}</b><span>Trust bond (refundable)</span></div>
       <div class="stat"><b>${money(s.boost)}</b><span>Monthly boost</span></div>
+      <div class="stat"><b>${s.orders}</b><span>Orders served</span></div>
     </div>
-    <p><span class="badge">Bond Protected</span> ${s.orders} orders served on this board.</p>
-    <p><a class="btn wa" href="dispute.html?shop=${s.id}">File a complaint about this shop</a>
+    ${waDigits ? `<p><a class="btn wa" href="${waLink("Hi " + s.name + ", I want to order from Trust Bond Board.")}">Order on WhatsApp</a></p>` : ""}
+    <h3>Products (${prods.length})</h3>
+    ${prodHtml}
+    <p style="margin-top:20px"><a class="btn" href="dispute.html?shop=${s.id}">File a complaint about this shop</a>
        <a class="btn ghost" href="board.html?cat=${s.cat}">Back to ${cat.name} board</a></p>
-    <p style="color:var(--muted);font-size:14px">Demo listing: WhatsApp ordering activates when the real shop joins with a verified bond.</p>`;
+    ${waDigits ? "" : `<p style="color:var(--muted);font-size:14px">Demo listing: WhatsApp ordering activates when the real shop joins with a verified bond.</p>`}`;
 }
 }
 render();
