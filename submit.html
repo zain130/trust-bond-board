@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>List Your Shop — Trust Bond Board</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a class="logo" href="index.html">Trust<span>Bond</span> Board</a>
+  <nav class="main">
+    <a href="index.html">Home</a>
+    <a href="submit.html">List Your Shop</a>
+    <a href="dispute.html">Complaint</a>
+    <a href="rules.html">Rules</a>
+  </nav>
+</div></header>
+<div class="wrap">
+  <h2>List your shop</h2>
+  <p style="color:var(--muted)">Listing is free. To rank, you place a refundable trust bond (Rs 2,000–20,000) and an optional monthly boost. Admin verifies payment before your shop goes live.</p>
+  <form id="submit-form">
+    <label>Shop name</label>
+    <input required id="f-name" placeholder="e.g. ChicBags">
+    <label>Category board</label>
+    <select id="f-cat"></select>
+    <label>Instagram / Facebook link</label>
+    <input required id="f-link" placeholder="https://instagram.com/yourshop">
+    <label>WhatsApp number (03xx-xxxxxxx)</label>
+    <input required id="f-wa" placeholder="03xx-xxxxxxx">
+    <label>Trust bond amount (Rs)</label>
+    <select id="f-bond">
+      <option value="2000">Rs 2,000</option>
+      <option value="5000">Rs 5,000</option>
+      <option value="10000" selected>Rs 10,000</option>
+      <option value="20000">Rs 20,000</option>
+    </select>
+    <label>What do you sell? (one line)</label>
+    <textarea required id="f-desc" placeholder="e.g. Handmade leather bags, COD nationwide"></textarea>
+    <br><button class="btn" type="submit">Submit for verification</button>
+  </form>
+  <div class="success" id="submit-ok">
+    <b>Request received (demo).</b> Your reference number is <b id="ref-no"></b>.
+    In the live version, admin will contact you on WhatsApp to verify your bond payment, then your shop goes live on its board.
+  </div>
+</div>
+<footer class="site"><div class="wrap">
+  Bond money is amanat: refundable on clean exit minus a 10% platform fee. One-time verification fee Rs 500–1,000 applies on approval.
+</div></footer>
+<script src="assets/data.js"></script>
+<script>
+document.getElementById("f-cat").innerHTML = CATEGORIES.map(c => `<option value="${c.slug}">${c.name}</option>`).join("");
+document.getElementById("submit-form").addEventListener("submit", function(e){
+  e.preventDefault();
+  document.getElementById("ref-no").textContent = "TBB-" + Math.floor(1000 + Math.random()*9000);
+  document.getElementById("submit-ok").style.display = "block";
+  window.scrollTo(0, document.getElementById("submit-ok").offsetTop - 80);
+});
+</script>
+</body>
+</html>

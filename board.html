@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Category Board — Trust Bond Board</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a class="logo" href="index.html">Trust<span>Bond</span> Board</a>
+  <nav class="main">
+    <a href="index.html">Home</a>
+    <a href="submit.html">List Your Shop</a>
+    <a href="dispute.html">Complaint</a>
+    <a href="rules.html">Rules</a>
+  </nav>
+</div></header>
+<div class="wrap">
+  <div class="demo"><b>Demo version:</b> listings below are sample data. <a href="submit.html">List your shop</a> to join the real board.</div>
+  <h2 id="board-title">Board</h2>
+  <p id="board-sub" style="color:var(--muted)"></p>
+  <div id="board-list"></div>
+  <p><a class="btn" href="submit.html">Is board par apni shop list karen</a></p>
+</div>
+<footer class="site"><div class="wrap">
+  Rank = monthly boost bid (non-refundable). Bond = refundable trust deposit shown on every shop. Sponsored ranks are labelled.
+</div></footer>
+<script src="assets/data.js"></script>
+<script>
+const slug = param("cat");
+const cat = catBySlug(slug);
+if(!cat){
+  document.getElementById("board-title").textContent = "Category not found";
+  document.getElementById("board-sub").textContent = "Go back to the homepage and pick a category board.";
+} else {
+  document.title = cat.name + " — Trust Bond Board";
+  document.getElementById("board-title").textContent = cat.icon + " " + cat.name;
+  document.getElementById("board-sub").textContent = "Subcategories: " + cat.subs.join(" · ");
+  const shops = rankedShops(slug);
+  document.getElementById("board-list").innerHTML = shops.length ? shops.map((s,i) => `
+    <div class="shoprow"><div class="rank">#${i+1}</div><div>
+      <h3><a href="shop.html?id=${s.id}">${s.name}</a></h3>
+      <p>${s.tag} · ${s.city} · ${s.handle} · ${s.orders} orders served</p>
+      <p>${s.desc}</p>
+      <p><span class="badge">Trust Bond ${money(s.bond)}</span> <span class="badge goldb">Boost ${money(s.boost)}/month</span></p>
+      <div class="actions"><a class="btn" href="shop.html?id=${s.id}">View shop</a></div>
+    </div></div>`).join("")
+    : "<p>No shops on this board yet. Be the first — <a href='submit.html'>list your shop</a>.</p>";
+}
+</script>
+</body>
+</html>

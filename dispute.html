@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>File a Complaint — Trust Bond Board</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a class="logo" href="index.html">Trust<span>Bond</span> Board</a>
+  <nav class="main">
+    <a href="index.html">Home</a>
+    <a href="submit.html">List Your Shop</a>
+    <a href="dispute.html">Complaint</a>
+    <a href="rules.html">Rules</a>
+  </nav>
+</div></header>
+<div class="wrap">
+  <h2>File a complaint</h2>
+  <p style="color:var(--muted)">Did a bonded shop take payment and not deliver, or send the wrong item? File here. The seller gets 7 days to resolve it. Unresolved complaints are refunded from the shop's trust bond.</p>
+  <form id="dispute-form">
+    <label>Shop</label>
+    <select id="d-shop"></select>
+    <label>Your WhatsApp number</label>
+    <input required id="d-wa" placeholder="03xx-xxxxxxx">
+    <label>Order amount (Rs)</label>
+    <input required type="number" min="1" id="d-amt" placeholder="e.g. 3000">
+    <label>What happened?</label>
+    <textarea required id="d-issue" placeholder="Payment sent on (date), no delivery / wrong item received. Attach payment receipt and chat screenshots when admin contacts you."></textarea>
+    <br><button class="btn" type="submit">Submit complaint</button>
+  </form>
+  <div class="success" id="dispute-ok">
+    <b>Complaint received (demo).</b> Your reference number is <b id="d-ref"></b>.
+    In the live version, the seller has 7 days to resolve this. If they do not, your refund comes from their trust bond.
+  </div>
+</div>
+<footer class="site"><div class="wrap">
+  False complaints are removed and repeat false filers are blocked. Keep your payment receipt and chat screenshots ready.
+</div></footer>
+<script src="assets/data.js"></script>
+<script>
+const pre = param("shop");
+document.getElementById("d-shop").innerHTML = SHOPS.map(s => `<option value="${s.id}" ${s.id===pre?"selected":""}>${s.name} (${catBySlug(s.cat).name})</option>`).join("");
+document.getElementById("dispute-form").addEventListener("submit", function(e){
+  e.preventDefault();
+  document.getElementById("d-ref").textContent = "TBB-D-" + Math.floor(1000 + Math.random()*9000);
+  document.getElementById("dispute-ok").style.display = "block";
+  window.scrollTo(0, document.getElementById("dispute-ok").offsetTop - 80);
+});
+</script>
+</body>
+</html>

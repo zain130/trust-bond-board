@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trust Bond Board — Pakistan ki bharosemand online shops</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a class="logo" href="index.html">Trust<span>Bond</span> Board</a>
+  <nav class="main">
+    <a href="index.html">Home</a>
+    <a href="submit.html">List Your Shop</a>
+    <a href="dispute.html">Complaint</a>
+    <a href="rules.html">Rules</a>
+  </nav>
+</div></header>
+<div class="wrap">
+  <div class="demo"><b>Demo version:</b> listings below are sample data so you can see how the board works. Real seller onboarding is open — <a href="submit.html">list your shop</a>.</div>
+
+  <section class="hero">
+    <h1>Pakistan ki bharosemand online shops, aik board par.</h1>
+    <p>Har shop ne apna <b>Trust Bond</b> jama karwaya hai. Bond bara ho to rank upar. Fraud ho to bond se buyer ko refund. Rank khareedna nahi, bharosa dikhana hai.</p>
+    <a class="btn gold" href="submit.html">Apni shop list karen</a>
+    <a class="btn ghost" href="rules.html">Bond kaise kaam karta hai?</a>
+  </section>
+
+  <div class="counters">
+    <div class="stat"><b id="c-shops">–</b><span>Protected shops</span></div>
+    <div class="stat"><b id="c-bond">–</b><span>Total trust bonds held</span></div>
+    <div class="stat"><b id="c-cats">12</b><span>Category boards</span></div>
+  </div>
+
+  <h2>Category boards</h2>
+  <div class="grid" id="cat-grid"></div>
+
+  <h2>Top bonded shops (all categories)</h2>
+  <div id="top-shops"></div>
+
+  <h2>Kaise kaam karta hai</h2>
+  <div class="steps">
+    <div class="step"><b>1</b><h3>Shop bond jama karwati hai</h3><p>Rs 2,000 se 20,000 tak refundable bond. Ye amanat hai, hamari kamai nahi.</p></div>
+    <div class="step"><b>2</b><h3>Boost se rank milti hai</h3><p>Monthly boost bid se rank upar hoti hai. Koi outbid kare to boost barha kar rank wapas lo.</p></div>
+    <div class="step"><b>3</b><h3>Fraud par bond se refund</h3><p>Complaint par seller ko 7 din milte hain. Hal na ho to bond se buyer ko refund.</p></div>
+  </div>
+</div>
+<footer class="site"><div class="wrap">
+  Trust Bond Board v0 (demo). Bond money is held as amanat and is refundable on clean exit minus a 10% platform fee. Boost bids are monthly and non-refundable. Paid ranks are always labelled.
+</div></footer>
+<script src="assets/data.js"></script>
+<script>
+document.getElementById("c-shops").textContent = SHOPS.length;
+document.getElementById("c-bond").textContent = money(SHOPS.reduce((s,x)=>s+x.bond,0));
+document.getElementById("cat-grid").innerHTML = CATEGORIES.map(c => {
+  const n = SHOPS.filter(s => s.cat === c.slug).length;
+  return `<a class="card" href="board.html?cat=${c.slug}"><div class="icon">${c.icon}</div><h3>${c.name}</h3><p>${n} demo shops · ${c.subs.slice(0,3).join(", ")}…</p></a>`;
+}).join("");
+const top = [...SHOPS].sort((a,b)=>(b.boost-a.boost)||(b.bond-a.bond)).slice(0,5);
+document.getElementById("top-shops").innerHTML = top.map((s,i) => `
+  <div class="shoprow"><div class="rank">#${i+1}</div><div>
+    <h3><a href="shop.html?id=${s.id}">${s.name}</a></h3>
+    <p>${catBySlug(s.cat).name} · ${s.tag} · ${s.city}</p>
+    <p><span class="badge">Trust Bond ${money(s.bond)}</span> <span class="badge goldb">Boost ${money(s.boost)}/month</span></p>
+  </div></div>`).join("");
+</script>
+</body>
+</html>

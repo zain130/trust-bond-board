@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shop — Trust Bond Board</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a class="logo" href="index.html">Trust<span>Bond</span> Board</a>
+  <nav class="main">
+    <a href="index.html">Home</a>
+    <a href="submit.html">List Your Shop</a>
+    <a href="dispute.html">Complaint</a>
+    <a href="rules.html">Rules</a>
+  </nav>
+</div></header>
+<div class="wrap">
+  <div class="demo"><b>Demo version:</b> this is a sample listing. Real shops will show their live WhatsApp order button here.</div>
+  <div id="shop-box"></div>
+</div>
+<footer class="site"><div class="wrap">
+  If this shop does not deliver or sends the wrong item, file a complaint within 7 days and the bond covers your refund.
+</div></footer>
+<script src="assets/data.js"></script>
+<script>
+const id = param("id");
+const s = SHOPS.find(x => x.id === id);
+if(!s){
+  document.getElementById("shop-box").innerHTML = "<h2>Shop not found</h2><p>Go back to the <a href='index.html'>homepage</a> and pick a board.</p>";
+} else {
+  const cat = catBySlug(s.cat);
+  const rank = rankedShops(s.cat).findIndex(x => x.id === s.id) + 1;
+  document.title = s.name + " — Trust Bond Board";
+  document.getElementById("shop-box").innerHTML = `
+    <h2>${s.name}</h2>
+    <p style="color:var(--muted)">${cat.name} · ${s.tag} · ${s.city} · ${s.handle}</p>
+    <p>${s.desc}</p>
+    <div class="counters">
+      <div class="stat"><b>#${rank}</b><span>Rank in ${cat.name}</span></div>
+      <div class="stat"><b>${money(s.bond)}</b><span>Trust bond (refundable)</span></div>
+      <div class="stat"><b>${money(s.boost)}</b><span>Monthly boost</span></div>
+    </div>
+    <p><span class="badge">Bond Protected</span> ${s.orders} orders served on this board.</p>
+    <p><a class="btn wa" href="dispute.html?shop=${s.id}">File a complaint about this shop</a>
+       <a class="btn ghost" href="board.html?cat=${s.cat}">Back to ${cat.name} board</a></p>
+    <p style="color:var(--muted);font-size:14px">Demo listing: WhatsApp ordering activates when the real shop joins with a verified bond.</p>`;
+}
+</script>
+</body>
+</html>
