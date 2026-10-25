@@ -16,7 +16,7 @@ const CATEGORIES = [
 
 /* bond = refundable trust deposit (amanat). boost = monthly, non-refundable rank bid.
    Rank inside a category = boost desc, then bond desc. */
-const SHOPS = [
+const DEMO_SHOPS = [
   {id:"chicbags", name:"ChicBags", cat:"watches-bags-jewellery", tag:"Womens Bags", city:"Lahore", handle:"@chicbags", bond:10000, boost:5000, orders:120, desc:"Handbags, clutches and totes. COD available nationwide."},
   {id:"lawnhouse", name:"LawnHouse", cat:"womens-fashion", tag:"Unstitched Fabric", city:"Karachi", handle:"@lawnhouse.pk", bond:15000, boost:8000, orders:340, desc:"Unstitched lawn and embroidered 3-piece suits, direct from mills."},
   {id:"glowskin", name:"GlowSkin.pk", cat:"health-beauty", tag:"Skin Care", city:"Islamabad", handle:"@glowskin.pk", bond:12000, boost:6500, orders:210, desc:"Original skincare, batch-checked. No replicas, ever."},
@@ -30,6 +30,17 @@ const SHOPS = [
   {id:"shinemakeup", name:"ShineMakeup", cat:"health-beauty", tag:"Makeup", city:"Karachi", handle:"@shinemakeup.pk", bond:13000, boost:6000, orders:190, desc:"Original makeup brands, shade-exchange available."},
   {id:"watchzone", name:"WatchZone", cat:"watches-bags-jewellery", tag:"Mens Watches", city:"Lahore", handle:"@watchzone.pk", bond:18000, boost:9000, orders:150, desc:"Mens watches with 1-year movement warranty."}
 ];
+
+/* Live data: SHOPS starts as the demo fallback, then loadLiveShops() swaps in
+   the approved shops from Supabase. On any fetch failure the demo data stays,
+   so the site never breaks. */
+let SHOPS = DEMO_SHOPS.slice();
+
+async function loadLiveShops(){
+  const live = await fetchLiveShops();
+  if(live){ SHOPS = live; return true; }
+  return false;
+}
 
 function catBySlug(slug){ return CATEGORIES.find(c => c.slug === slug); }
 function rankedShops(catSlug){
