@@ -39,6 +39,7 @@ if(!s){
   const prods = productsForShop(s.id);
   const prodHtml = prods.length ? `<div class="grid">${prods.map(p => `
     <div class="pcard">
+      <div class="pimg">📦${p.img ? `<img src="${p.img}" alt="${p.name}" loading="lazy" onerror="this.remove()">` : ""}</div>
       <h3>${p.name}</h3>
       <p>${p.tag}</p>
       <div class="price">${money(p.price)}</div>
@@ -47,9 +48,14 @@ if(!s){
     : "<p>No products listed yet.</p>";
   document.title = s.name + " — Trust Bond Board";
   document.getElementById("shop-box").innerHTML = `
-    <h2>${s.name} <span class="badge">Bond Protected</span></h2>
-    <p style="color:var(--muted)">${[cat.name, s.tag, s.city, s.handle].filter(x => x).join(" · ")}</p>
-    <p>${s.desc}</p>
+    <div class="shop-hero">
+      <div class="avatar">${s.name.charAt(0).toUpperCase()}</div>
+      <div>
+        <h2>${s.name} <span class="badge">Bond Protected</span></h2>
+        <p>${[cat.name, s.tag, s.city, s.handle].filter(x => x).join(" · ")}</p>
+        <p>${s.desc}</p>
+      </div>
+    </div>
     <div class="counters">
       <div class="stat"><b>#${rank}</b><span>Rank in ${cat.name}</span></div>
       <div class="stat"><b>${money(s.bond)}</b><span>Trust bond (refundable)</span></div>
@@ -60,7 +66,8 @@ if(!s){
     <h3>Products (${prods.length})</h3>
     ${prodHtml}
     <p style="margin-top:20px"><a class="btn" href="dispute.html?shop=${s.id}">File a complaint about this shop</a>
-       <a class="btn ghost" href="board.html?cat=${s.cat}">Back to ${cat.name} board</a></p>
+       <a class="btn ghost" href="board.html?cat=${s.cat}">Back to ${cat.name} board</a>
+       <a class="btn ghost" href="manage.html?shop=${s.id}">Manage this shop</a></p>
     ${waDigits ? "" : `<p style="color:var(--muted);font-size:14px">Demo listing: WhatsApp ordering activates when the real shop joins with a verified bond.</p>`}`;
 }
 }

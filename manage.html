@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manage My Shop — Trust Bond Board</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a class="logo" href="index.html">Trust<span>Bond</span> Board</a>
+  <nav class="main">
+    <a href="index.html">Home</a>
+    <a href="submit.html">List Your Shop</a>
+    <a href="dispute.html">Complaint</a>
+    <a href="rules.html">Rules</a>
+  </nav>
+</div></header>
+<div class="wrap">
+  <h2>Manage my shop</h2>
+  <p style="color:var(--muted)">Seller apni products yahan se add ya delete kar sakta hai. PIN admin aap ko WhatsApp par dega jab aap ki shop approve hogi.</p>
+
+  <div id="lock-box">
+    <label>Shop</label>
+    <select id="m-shop"></select>
+    <label>Management PIN</label>
+    <input id="m-pin" inputmode="numeric" placeholder="e.g. 1234">
+    <br><button class="btn" id="m-unlock">Open my shop</button>
+    <p id="m-err" style="display:none;color:#b42318">Shop ya PIN ghalat hai. Dobara try karen.</p>
+  </div>
+
+  <div id="manage-box" style="display:none">
+    <h3 id="m-title"></h3>
+    <div id="m-list"></div>
+    <h3>Add a product</h3>
+    <form id="m-add">
+      <label>Product name</label>
+      <input required id="a-name" placeholder="e.g. Leather Tote Bag">
+      <label>Price (Rs)</label>
+      <input required type="number" min="1" id="a-price" placeholder="e.g. 3500">
+      <label>Tag (e.g. Tote Bags, Rings)</label>
+      <input id="a-tag" placeholder="e.g. Tote Bags">
+      <label>Image URL (optional, Instagram ya kisi image ka link)</label>
+      <input id="a-img" placeholder="https://...">
+      <br><button class="btn" type="submit">Add product</button>
+    </form>
+    <p id="m-msg" style="display:none"></p>
+  </div>
+
+  <div class="demo"><b>v0 note:</b> ye PIN sirf aik soft gate hai. Asli seller login (email OTP) agle step me aayega.</div>
+</div>
+<footer class="site"><div class="wrap">
+  Products yahan se add/delete karne par foran aap ki shop page par nazar aayenge.
+</div></footer>
+<script src="assets/supabase.js"></script>
+<script src="assets/data.js"></script>
+<script>
+const pre = param("shop");
+function fillShops(){
+  document.getElementById("m-shop").innerHTML = SHOPS.map(s => `<option value="${s.id}" ${s.id===pre?"selected":""}>${s.name} (${catBySlug(s.cat).name})</option>`).join("");
+}
+fillShops();
+loadLiveShops().then(fillShops);
+let current = null;
+function renderList(){
+  const prods = productsForShop(current.id);
+  document.getElementById("m-title").textContent = current.name + " — " + prods.length + " products";
+  document.getElementById("m-list").innerHTML = prods.length ? prods.map(p => `
+    <div class="prow">
+      ${p.img ? `<img src="${p.img}" alt="${p.name}" loading="lazy" onerror="this.remove()">` : `<div style="width:64px;height:64px;min-width:64px;border-radius:8px;background:linear-gradient(135deg,#eef3f1,#dde6e2);display:flex;align-items:center;justify-content:center;font-size:26px">📦</div>`}
+      <div class="grow"><b>${p.name}</b><p>${p.tag} · ${money(p.price)}</p></div>
+      <button class="btn danger" data-del="${p.id}" data-name="${p.name}">Delete</button>
+    </div>`).join("") : "<p>No products yet. Add your first product below.</p>";
+  document.querySelectorAll("[data-del]").forEach(b => b.addEventListener("click", async () => {
+    if(!confirm("Delete '" + b.dataset.name + "'?")) return;
+    const ok = await deleteProduct(b.dataset.del);
+    if(ok){ await loadLiveShops(); renderList(); }
+    else { alert("Delete nahi hua, dobara try karen."); }
+  }));
+}
+document.getElementById("m-unlock").addEventListener("click", async () => {
+  await loadLiveShops();
+  fillShops();
+  const s = SHOPS.find(x => x.id === document.getElementById("m-shop").value);
+  const pin = document.getElementById("m-pin").value.trim();
+  if(s && s.pin && s.pin === pin){
+    current = s;
+    document.getElementById("lock-box").style.display = "none";
+    document.getElementById("manage-box").style.display = "block";
+    document.getElementById("m-err").style.display = "none";
+    renderList();
+  } else {
+    document.getElementById("m-err").style.display = "block";
+  }
+});
+document.getElementById("m-add").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const msg = document.getElementById("m-msg");
+  const row = await addProduct({
+    id: "p-" + Date.now().toString(36),
+    shop_id: current.id,
+    name: document.getElementById("a-name").value.trim(),
+    price: parseInt(document.getElementById("a-price").value, 10),
+    tag: document.getElementById("a-tag").value.trim() || null,
+    image_url: document.getElementById("a-img").value.trim() || null
+  });
+  if(row){
+    msg.textContent = "Product add ho gaya hai.";
+    msg.style.display = "block";
+    e.target.reset();
+    await loadLiveShops();
+    renderList();
+  } else {
+    msg.textContent = "Add nahi hua, dobara try karen.";
+    msg.style.display = "block";
+  }
+});
+</script>
+</body>
+</html>
