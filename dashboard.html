@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Seller Dashboard — ShoppingOye</title>
+<link rel="stylesheet" href="assets/style.css?v=8">
+<link rel="icon" type="image/svg+xml" href="assets/logo-mark.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Dashboard-only styles (Phase 15). The main design system stays in style.css. */
+.dash-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);margin-bottom:16px}
+.dash-card h3{margin-top:0}
+.muted{color:var(--muted);font-size:14px}
+.auth-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.auth-row .btn{margin:0}
+.shopstat{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.shopstat .stat{padding:12px 16px;flex:1;min-width:120px}
+.shopstat .stat b{font-size:20px}
+.dash-shop .actions{margin-top:10px}
+.dash-shop .actions .btn{margin-right:8px}
+</style>
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a class="logo" href="index.html"><img src="assets/logo.svg" alt="ShoppingOye"></a>
+  <nav class="main">
+    <a href="index.html">Home</a>
+    <a class="cta" href="submit.html">List Your Shop</a>
+    <a href="dispute.html">Complaint</a>
+    <a href="rules.html">Rules</a>
+    <a href="dashboard.html">Seller login</a>
+  </nav>
+</div></header>
+<div class="wrap">
+  <h2>Seller dashboard</h2>
+  <p style="color:var(--muted)">Apni shop, products, boost aur complaints aik jagah se manage karen.</p>
+
+  <!-- Auth box -->
+  <div class="dash-card" id="auth-box">
+    <h3>Login karen</h3>
+    <p class="muted">Email aur password se login karen. Account nahi hai to "Create account" dabayen. Account banne ke baad admin aap ki shop ko aap ke account se link karega, phir aap ki shops yahan nazar aayengi.</p>
+    <form id="auth-form">
+      <label>Email</label>
+      <input required type="email" id="a-email" placeholder="aap@example.com" autocomplete="email">
+      <label>Password</label>
+      <input required type="password" id="a-pass" placeholder="Kam se kam 6 harf" minlength="6" autocomplete="current-password">
+      <div class="auth-row">
+        <button class="btn" type="submit" id="btn-signin">Sign in</button>
+        <button class="btn ghost" type="button" id="btn-signup">Create account</button>
+        <button class="btn ghost" type="button" id="btn-reset">Password bhool gaye?</button>
+      </div>
+    </form>
+    <p id="auth-msg" class="muted" style="display:none"></p>
+  </div>
+
+  <!-- Dashboard (signed in) -->
+  <div id="dash-box" style="display:none">
+    <div class="dash-card">
+      <p style="margin:0">Logged in as <b id="dash-email"></b> <button class="btn ghost small" id="btn-signout" style="margin-left:10px">Sign out</button></p>
+    </div>
+
+    <h2 style="margin-top:28px">Meri shops</h2>
+    <div id="my-shops"><p class="muted">Load ho raha hai...</p></div>
+
+    <h2 style="margin-top:28px">Products</h2>
+    <div class="dash-card">
+      <label>Shop</label>
+      <select id="p-shop"></select>
+      <div id="my-products" style="margin-top:16px"></div>
+      <h3 id="p-form-title" style="margin-top:20px">Add a product</h3>
+      <form id="p-add">
+        <label>Product name</label>
+        <input required id="p-name" placeholder="e.g. Leather Tote Bag">
+        <label>Price (Rs)</label>
+        <input required type="number" min="1" id="p-price" placeholder="e.g. 3500">
+        <label>Tag (e.g. Tote Bags, Rings)</label>
+        <input id="p-tag" placeholder="e.g. Tote Bags">
+        <label>Image URL (optional, Instagram ya kisi image ka link)</label>
+        <input id="p-img" placeholder="https://...">
+        <img id="p-preview" style="display:none;max-width:220px;border-radius:10px;margin-top:10px" alt="">
+        <br><button class="btn" type="submit" id="p-submit">Add product</button>
+        <button class="btn ghost" type="button" id="p-cancel" style="display:none">Cancel edit</button>
+      </form>
+      <p id="p-msg" class="muted" style="display:none"></p>
+    </div>
+
+    <h2 style="margin-top:28px">Boost (rank barhana)</h2>
+    <div class="dash-card" id="boost-box"><p class="muted">Load ho raha hai...</p></div>
+
+    <h2 style="margin-top:28px">Complaints</h2>
+    <div id="my-disputes"><p class="muted">Load ho raha hai...</p></div>
+  </div>
+</div>
+<footer class="site"><div class="wrap">
+  Boost payment manual hai, admin se WhatsApp par hoti hai. Bond money amanat hai aur clean exit par refund hoti hai (10% platform fee minus).
+</div></footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/supabase.js"></script>
+<script src="assets/data.js"></script>
+<script>
+/* Admin ka WhatsApp number (digits only, country code ke saath, e.g. "923001234567").
+   Abhi khaali hai, is liye boost wala WhatsApp button nahi dikhega.
+   Number milte hi yahan likh den (aur phir site dobara deploy karen). */
+const ADMIN_WHATSAPP = "";
+
+let myShops = [];
+let selectedShopId = null;
+let editingId = null;
+let liveOk = false;
+let shopsLoadError = false;
+
+function showMsg(el, text){ el.textContent = text; el.style.display = "block"; }
+function hideMsg(el){ el.style.display = "none"; }
+
+function friendlyAuthError(msg){
+  if(!msg) return "Kuch ghalat ho gaya, dobara try karen.";
+  if(msg.indexOf("Invalid login credentials") !== -1) return "Email ya password ghalat hai.";
+  if(msg.indexOf("Email not confirmed") !== -1) return "Pehle apni email confirm karen, inbox me confirmation link aaya hoga.";
+  if(msg.indexOf("User already registered") !== -1) return "Is email par account pehle se hai, Sign in karen.";
+  if(msg.indexOf("Password should be at least") !== -1) return "Password kam se kam 6 harf ka hona chahiye.";
+  return msg;
+}
+
+function statusBadge(s){
+  if(s === "approved") return '<span class="badge">Approved</span>';
+  if(s === "pending") return '<span class="badge muted">Approval pending</span>';
+  return '<span class="badge muted">' + s + "</span>";
+}
+function disputeBadge(s){
+  if(s === "open") return '<span class="badge goldb">Khuli hui</span>';
+  if(s === "resolved") return '<span class="badge">Hal ho gayi</span>';
+  if(s === "refunded") return '<span class="badge">Refund ho gaya</span>';
+  return '<span class="badge muted">' + s + "</span>";
+}
+
+function showAuth(){
+  document.getElementById("auth-box").style.display = "block";
+  document.getElementById("dash-box").style.display = "none";
+}
+
+async function showDash(user){
+  document.getElementById("auth-box").style.display = "none";
+  document.getElementById("dash-box").style.display = "block";
+  document.getElementById("dash-email").textContent = user.email || "";
+  liveOk = await loadLiveShops();
+  const shops = await authGetMyShops();
+  if(shops === null){
+    shopsLoadError = true;
+    myShops = [];
+  } else {
+    shopsLoadError = false;
+    myShops = shops;
+  }
+  renderShops();
+  fillProductShopSelect();
+  renderBoost();
+  renderDisputes();
+}
+
+function shopRank(s){
+  if(!liveOk) return null;
+  const ranked = rankedShops(s.cat);
+  const i = ranked.findIndex(x => x.id === s.id);
+  return i === -1 ? null : i + 1;
+}
+
+function renderShops(){
+  const box = document.getElementById("my-shops");
+  if(shopsLoadError){
+    box.innerHTML = '<div class="dash-card"><p>Shops load nahi hui, page dobara load kar ke try karen.</p></div>';
+    return;
+  }
+  if(!myShops.length){
+    box.innerHTML = '<div class="dash-card"><p>Abhi aap ke account se koi shop link nahi hui.</p><p class="muted">Shop approve hote waqt admin aap ka account link karega. Agar aap ne shop abhi list nahi ki to <a href="submit.html">List Your Shop</a> par jayen.</p></div>';
+    return;
+  }
+  box.innerHTML = myShops.map(s => {
+    const rank = shopRank(s);
+    return `<div class="dash-card dash-shop">
+      <h3>${s.name} ${statusBadge(s.status)} ${s.bondVerified ? '<span class="badge">✓ Bond Protected</span>' : '<span class="badge muted">Bond verification pending</span>'}</h3>
+      <p class="muted">${catBySlug(s.cat) ? catBySlug(s.cat).name : s.cat} · ${s.tag || ""} · ${s.city || ""}</p>
+      <div class="shopstat">
+        <div class="stat"><b>${money(s.bond)}</b><span>Trust Bond</span></div>
+        <div class="stat"><b>${money(s.boost)}</b><span>Total boost paid</span></div>
+        <div class="stat"><b>${rank === null ? "–" : "#" + rank}</b><span>Rank in board</span></div>
+        <div class="stat"><b>${s.orders || 0}</b><span>Orders</span></div>
+      </div>
+      <div class="actions">
+        <a class="btn small" href="shop.html?id=${s.id}">View shop page</a>
+        <button class="btn ghost small" data-manage="${s.id}">Manage products</button>
+      </div>
+    </div>`;
+  }).join("");
+  box.querySelectorAll("[data-manage]").forEach(b => b.addEventListener("click", () => {
+    selectedShopId = b.dataset.manage;
+    document.getElementById("p-shop").value = selectedShopId;
+    renderProducts();
+    renderBoost();
+    window.scrollTo(0, document.getElementById("p-shop").offsetTop - 80);
+  }));
+}
+
+function fillProductShopSelect(){
+  const sel = document.getElementById("p-shop");
+  const form = document.getElementById("p-add");
+  const title = document.getElementById("p-form-title");
+  if(!myShops.length){
+    sel.innerHTML = "";
+    form.style.display = "none";
+    title.style.display = "none";
+    document.getElementById("my-products").innerHTML = '<p class="muted">Pehle apni shop account se link karwayen, phir products yahan nazar aayenge.</p>';
+    return;
+  }
+  form.style.display = "";
+  title.style.display = "";
+  sel.innerHTML = myShops.map(s => `<option value="${s.id}">${s.name}</option>`).join("");
+  if(!selectedShopId || !myShops.find(s => s.id === selectedShopId)) selectedShopId = myShops[0].id;
+  sel.value = selectedShopId;
+  renderProducts();
+}
+
+function renderProducts(){
+  const box = document.getElementById("my-products");
+  if(!selectedShopId){ box.innerHTML = ""; return; }
+  const prods = productsForShop(selectedShopId);
+  box.innerHTML = prods.length ? prods.map(p => `
+    <div class="prow">
+      ${p.img ? `<img src="${p.img}" alt="${p.name}" loading="lazy" onerror="this.remove()">` : `<div style="width:64px;height:64px;min-width:64px;border-radius:8px;background:linear-gradient(135deg,#F9FAFB,#BAE6FD);display:flex;align-items:center;justify-content:center;font-size:26px">📦</div>`}
+      <div class="grow"><b>${p.name}</b><p>${p.tag} · ${money(p.price)}</p></div>
+      <button class="btn ghost" data-edit="${p.id}">Edit</button>
+      <button class="btn danger" data-del="${p.id}" data-name="${p.name}">Delete</button>
+    </div>`).join("") : "<p>No products yet. Add your first product below.</p>";
+  box.querySelectorAll("[data-del]").forEach(b => b.addEventListener("click", async () => {
+    if(!confirm("Delete '" + b.dataset.name + "'?")) return;
+    const ok = await sbDeleteProduct(b.dataset.del);
+    if(ok){ await loadLiveShops(); renderProducts(); }
+    else { alert("Delete nahi hua, dobara try karen."); }
+  }));
+  box.querySelectorAll("[data-edit]").forEach(b => b.addEventListener("click", () => {
+    const p = PRODUCTS.find(x => x.id === b.dataset.edit);
+    if(!p) return;
+    editingId = p.id;
+    document.getElementById("p-name").value = p.name;
+    document.getElementById("p-price").value = p.price;
+    document.getElementById("p-tag").value = p.tag || "";
+    document.getElementById("p-img").value = p.img || "";
+    showPreview(p.img || "");
+    document.getElementById("p-form-title").textContent = "Edit product";
+    document.getElementById("p-submit").textContent = "Save changes";
+    document.getElementById("p-cancel").style.display = "inline-block";
+    window.scrollTo(0, document.getElementById("p-add").offsetTop - 80);
+  }));
+}
+
+function showPreview(url){
+  const img = document.getElementById("p-preview");
+  if(url){ img.src = url; img.style.display = "block"; img.onerror = () => { img.style.display = "none"; }; }
+  else { img.style.display = "none"; }
+}
+
+function resetProductForm(){
+  editingId = null;
+  document.getElementById("p-add").reset();
+  showPreview("");
+  document.getElementById("p-form-title").textContent = "Add a product";
+  document.getElementById("p-submit").textContent = "Add product";
+  document.getElementById("p-cancel").style.display = "none";
+}
+
+function renderBoost(){
+  const box = document.getElementById("boost-box");
+  const s = myShops.find(x => x.id === selectedShopId) || myShops[0];
+  if(!s){
+    box.innerHTML = '<p class="muted">Koi shop link nahi hui, is liye boost ka hisaab nahi dikhaya ja sakta.</p>';
+    return;
+  }
+  let html = `<h3>${s.name}</h3><p class="muted">Total boost paid: <b>${money(s.boost)}</b></p>`;
+  if(!liveOk){
+    html += '<p class="muted">Live data nahi mili, is liye rank ka hisaab nahi dikhaya ja sakta. Internet check kar ke page dobara load karen.</p>';
+  } else {
+    const ranked = rankedShops(s.cat);
+    const idx = ranked.findIndex(x => x.id === s.id);
+    const rank = idx === -1 ? null : idx + 1;
+    const topTotal = ranked.length ? ranked[0].boost : s.boost;
+    const target = topTotal + 1000;
+    const need = target - s.boost;
+    if(rank === null){
+      html += '<p class="muted">Ye shop abhi live board par nahi hai (approval pending ho sakti hai), is liye rank ka hisaab nahi dikhaya ja sakta.</p>';
+    } else if(rank === 1){
+      html += '<p class="climb">🏆 Ye shop is board par #1 par hai.</p>';
+    } else if(s.boost > 0){
+      html += `<p class="climb">Top position ke liye total ${money(target)} chahiye. Is shop ne pehle ${money(s.boost)} boost diya hua hai, jo count hoga, is liye sirf ${money(need)} ka farq dena hoga.</p>`;
+    } else {
+      html += `<p class="climb">Top position claim karne ke liye ${money(target)} chahiye (pehli dafa poori raqam).</p>`;
+    }
+    if(rank !== null && rank !== 1){
+      if(ADMIN_WHATSAPP){
+        const text = "Assalam-o-Alaikum, main " + s.name + " ki boost payment karna chahta hun. Farq: " + money(need) + " (top total " + money(target) + ").";
+        html += `<a class="btn wa" href="https://wa.me/${ADMIN_WHATSAPP}?text=${encodeURIComponent(text)}">WhatsApp par boost payment karen (${money(need)})</a>`;
+      } else {
+        html += '<p class="muted">Payment manual hai: admin ko WhatsApp par bataen ke kitni boost chahiye. Admin ka WhatsApp number jald yahan add hoga.</p>';
+      }
+    }
+  }
+  html += '<p class="muted">Boost aik dafa di gayi raqam hamesha aap ke total me rehti hai, aur wapas nahi hoti.</p>';
+  box.innerHTML = html;
+}
+
+async function renderDisputes(){
+  const box = document.getElementById("my-disputes");
+  if(!myShops.length){
+    box.innerHTML = '<div class="dash-card"><p class="muted">Koi shop link nahi hui, is liye complaints nahi dikhayi ja sakti.</p></div>';
+    return;
+  }
+  const rows = await authGetMyDisputes(myShops.map(s => s.id));
+  if(rows === null){
+    box.innerHTML = '<div class="dash-card"><p>Complaints load nahi hui, page dobara load kar ke try karen.</p></div>';
+    return;
+  }
+  if(!rows.length){
+    box.innerHTML = '<div class="dash-card"><p>Koi complaint nahi hai. 👍</p><p class="muted">Complaint aaye to seller ko hal karne ke liye 7 din milte hain, warna buyer ko bond se refund milta hai.</p></div>';
+    return;
+  }
+  box.innerHTML = rows.map(d => {
+    const shop = myShops.find(s => s.id === d.shop_id);
+    return `<div class="dash-card">
+      <h3>${d.id} ${disputeBadge(d.status || "open")}</h3>
+      <p class="muted">${shop ? shop.name : d.shop_id} · Order amount: <b>${money(d.amount || 0)}</b></p>
+      <p>${d.detail || ""}</p>
+      <p class="muted">Buyer WhatsApp: ${d.buyer_whatsapp || "–"} (7 din me hal karen, warna bond se refund hoga.)</p>
+    </div>`;
+  }).join("");
+}
+
+/* ---- Auth wiring ---- */
+document.getElementById("auth-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const msg = document.getElementById("auth-msg");
+  const email = document.getElementById("a-email").value.trim();
+  const pass = document.getElementById("a-pass").value;
+  const btn = document.getElementById("btn-signin");
+  btn.disabled = true; btn.textContent = "Signing in...";
+  const { error } = await authSignIn(email, pass);
+  btn.disabled = false; btn.textContent = "Sign in";
+  if(error){ showMsg(msg, friendlyAuthError(error.message)); return; }
+  hideMsg(msg);
+});
+
+document.getElementById("btn-signup").addEventListener("click", async () => {
+  const msg = document.getElementById("auth-msg");
+  const email = document.getElementById("a-email").value.trim();
+  const pass = document.getElementById("a-pass").value;
+  if(!email || pass.length < 6){ showMsg(msg, "Email likhen aur kam se kam 6 harf ka password rakhen."); return; }
+  const { data, error } = await authSignUp(email, pass);
+  if(error){ showMsg(msg, friendlyAuthError(error.message)); return; }
+  if(data && data.session){ hideMsg(msg); return; }
+  showMsg(msg, "Account ban gaya hai. Email confirm karen: inbox me confirmation link aaya hoga, us par click karen, phir yahan sign in karen.");
+});
+
+document.getElementById("btn-reset").addEventListener("click", async () => {
+  const msg = document.getElementById("auth-msg");
+  const email = document.getElementById("a-email").value.trim();
+  if(!email){ showMsg(msg, "Pehle email wale khane me apni email likhen."); return; }
+  const { error } = await authResetPassword(email);
+  if(error){ showMsg(msg, friendlyAuthError(error.message)); return; }
+  showMsg(msg, "Reset link bhej diya hai (agar is email par account hai to). Inbox check karen.");
+});
+
+document.getElementById("btn-signout").addEventListener("click", async () => {
+  await authSignOut();
+  selectedShopId = null; myShops = [];
+  showAuth();
+});
+
+/* ---- Products wiring ---- */
+document.getElementById("p-shop").addEventListener("change", (e) => {
+  selectedShopId = e.target.value;
+  resetProductForm();
+  renderProducts();
+  renderBoost();
+});
+document.getElementById("p-img").addEventListener("input", (e) => showPreview(e.target.value.trim()));
+document.getElementById("p-cancel").addEventListener("click", () => resetProductForm());
+document.getElementById("p-add").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const msg = document.getElementById("p-msg");
+  if(!selectedShopId){ showMsg(msg, "Pehle shop select karen."); return; }
+  const data = {
+    name: document.getElementById("p-name").value.trim(),
+    price: parseInt(document.getElementById("p-price").value, 10),
+    tag: document.getElementById("p-tag").value.trim() || null,
+    image_url: document.getElementById("p-img").value.trim() || null
+  };
+  let row = null;
+  if(editingId){ row = await sbUpdateProduct(editingId, data); }
+  else { row = await sbAddProduct(Object.assign({ id: "p-" + Date.now().toString(36), shop_id: selectedShopId }, data)); }
+  if(row){
+    showMsg(msg, editingId ? "Product update ho gaya hai." : "Product add ho gaya hai.");
+    resetProductForm();
+    await loadLiveShops();
+    renderProducts();
+  } else {
+    showMsg(msg, "Save nahi hua. Ho sakta hai aap ki shop is account se link na ho, ya internet ka masla ho. Dobara try karen.");
+  }
+});
+
+/* ---- Init ---- */
+(async function(){
+  const { data } = await authGetSession();
+  if(data && data.session){ showDash(data.session.user); }
+  else { showAuth(); }
+  const client = getSbClient();
+  if(client){
+    client.auth.onAuthStateChange((_event, session) => {
+      if(session){ showDash(session.user); }
+      else { selectedShopId = null; myShops = []; showAuth(); }
+    });
+  }
+})();
+</script>
+</body>
+</html>

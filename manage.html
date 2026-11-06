@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Manage My Shop — ShoppingOye</title>
-<link rel="stylesheet" href="assets/style.css?v=7">
+<link rel="stylesheet" href="assets/style.css?v=8">
 <link rel="icon" type="image/svg+xml" href="assets/logo-mark.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,10 +18,12 @@
     <a class="cta" href="submit.html">List Your Shop</a>
     <a href="dispute.html">Complaint</a>
     <a href="rules.html">Rules</a>
+    <a href="dashboard.html">Seller login</a>
   </nav>
 </div></header>
 <div class="wrap">
   <h2>Manage my shop</h2>
+  <div class="demo"><b>Naya tareeqa:</b> <a href="dashboard.html">Seller dashboard</a> par email se login karen, PIN ki zaroorat nahi. Neeche wala PIN tareeqa bhi kaam karta hai.</div>
   <p style="color:var(--muted)">Seller apni products yahan se add ya delete kar sakta hai. PIN admin aap ko WhatsApp par dega jab aap ki shop approve hogi.</p>
   <div class="demo"><b>Products kaise list karen (3 steps):</b> 1) PIN se login karen. 2) Neeche form me product ka naam, price aur tasveer ka link den, Add dabayen. 3) Product foran aap ki shop page par live ho jayega. Kisi product ko badalna ho to Edit, hatana ho to Delete dabayen.</div>
 
@@ -80,7 +82,7 @@ function renderList(){
   document.getElementById("m-bond").textContent = "Trust Bond: " + money(current.bond) + (current.bondVerified ? " (✓ Verified, Bond Protected badge active)" : " (verification pending)");
   document.getElementById("m-list").innerHTML = prods.length ? prods.map(p => `
     <div class="prow">
-      ${p.img ? `<img src="${p.img}" alt="${p.name}" loading="lazy" onerror="this.remove()">` : `<div style="width:64px;height:64px;min-width:64px;border-radius:8px;background:linear-gradient(135deg,#eef3f1,#dde6e2);display:flex;align-items:center;justify-content:center;font-size:26px">📦</div>`}
+      ${p.img ? `<img src="${p.img}" alt="${p.name}" loading="lazy" onerror="this.remove()">` : `<div style="width:64px;height:64px;min-width:64px;border-radius:8px;background:linear-gradient(135deg,#F9FAFB,#BAE6FD);display:flex;align-items:center;justify-content:center;font-size:26px">📦</div>`}
       <div class="grow"><b>${p.name}</b><p>${p.tag} · ${money(p.price)}</p></div>
       <button class="btn ghost" data-edit="${p.id}">Edit</button>
       <button class="btn danger" data-del="${p.id}" data-name="${p.name}">Delete</button>
