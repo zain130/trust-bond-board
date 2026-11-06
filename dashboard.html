@@ -343,10 +343,15 @@ document.getElementById("auth-form").addEventListener("submit", async (e) => {
   const pass = document.getElementById("a-pass").value;
   const btn = document.getElementById("btn-signin");
   btn.disabled = true; btn.textContent = "Signing in...";
-  const { error } = await authSignIn(email, pass);
-  btn.disabled = false; btn.textContent = "Sign in";
-  if(error){ showMsg(msg, friendlyAuthError(error.message)); return; }
-  hideMsg(msg);
+  try {
+    const { error } = await authSignIn(email, pass);
+    if(error){ showMsg(msg, friendlyAuthError(error.message)); return; }
+    hideMsg(msg);
+  } catch(err) {
+    showMsg(msg, "Sign in nahi ho saka, internet check kar ke dobara try karen.");
+  } finally {
+    btn.disabled = false; btn.textContent = "Sign in";
+  }
 });
 
 document.getElementById("btn-signup").addEventListener("click", async () => {
@@ -354,23 +359,31 @@ document.getElementById("btn-signup").addEventListener("click", async () => {
   const email = document.getElementById("a-email").value.trim();
   const pass = document.getElementById("a-pass").value;
   if(!email || pass.length < 6){ showMsg(msg, "Email likhen aur kam se kam 6 harf ka password rakhen."); return; }
-  const { data, error } = await authSignUp(email, pass);
-  if(error){ showMsg(msg, friendlyAuthError(error.message)); return; }
-  if(data && data.session){ hideMsg(msg); return; }
-  showMsg(msg, "Account ban gaya hai. Email confirm karen: inbox me confirmation link aaya hoga, us par click karen, phir yahan sign in karen.");
+  try {
+    const { data, error } = await authSignUp(email, pass);
+    if(error){ showMsg(msg, friendlyAuthError(error.message)); return; }
+    if(data && data.session){ hideMsg(msg); return; }
+    showMsg(msg, "Account ban gaya hai. Email confirm karen: inbox me confirmation link aaya hoga, us par click karen, phir yahan sign in karen.");
+  } catch(err) {
+    showMsg(msg, "Account nahi ban saka, internet check kar ke dobara try karen.");
+  }
 });
 
 document.getElementById("btn-reset").addEventListener("click", async () => {
   const msg = document.getElementById("auth-msg");
   const email = document.getElementById("a-email").value.trim();
   if(!email){ showMsg(msg, "Pehle email wale khane me apni email likhen."); return; }
-  const { error } = await authResetPassword(email);
-  if(error){ showMsg(msg, friendlyAuthError(error.message)); return; }
-  showMsg(msg, "Reset link bhej diya hai (agar is email par account hai to). Inbox check karen.");
+  try {
+    const { error } = await authResetPassword(email);
+    if(error){ showMsg(msg, friendlyAuthError(error.message)); return; }
+    showMsg(msg, "Reset link bhej diya hai (agar is email par account hai to). Inbox check karen.");
+  } catch(err) {
+    showMsg(msg, "Reset link nahi bheja ja saka, internet check kar ke dobara try karen.");
+  }
 });
 
 document.getElementById("btn-signout").addEventListener("click", async () => {
-  await authSignOut();
+  try { await authSignOut(); } catch(err) { /* phir bhi local state saaf karo */ }
   selectedShopId = null; myShops = [];
   showAuth();
 });
@@ -409,9 +422,11 @@ document.getElementById("p-add").addEventListener("submit", async (e) => {
 
 /* ---- Init ---- */
 (async function(){
-  const { data } = await authGetSession();
-  if(data && data.session){ showDash(data.session.user); }
-  else { showAuth(); }
+  try {
+    const { data } = await authGetSession();
+    if(data && data.session){ showDash(data.session.user); }
+    else { showAuth(); }
+  } catch(err) { showAuth(); }
   const client = getSbClient();
   if(client){
     client.auth.onAuthStateChange((_event, session) => {
