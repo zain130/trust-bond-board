@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ShoppingOye — Pakistan ki bharosemand online shops</title>
-<link rel="stylesheet" href="assets/style.css?v=8">
+<link rel="stylesheet" href="assets/style.css?v=9">
 <link rel="icon" type="image/svg+xml" href="assets/logo-mark.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,30 +25,43 @@
   <div class="demo"><b>Demo version:</b> listings below are sample data so you can see how the board works. Real seller onboarding is open — <a href="submit.html">list your shop</a>.</div>
 
   <section class="hero">
-    <h1>Pakistan ki bharosemand online shops, aik board par.</h1>
+    <div class="trust-pill"><b>●</b> Rank khareedna nahi, bharosa dikhana hai</div>
+    <h1>Pakistan ki online shops, <span class="hero-accent">bharose</span> ke saath.</h1>
     <p>Har shop ne apna <b>Trust Bond</b> jama karwaya hai. Bond bara ho to rank upar. Fraud ho to bond se buyer ko refund. Rank khareedna nahi, bharosa dikhana hai.</p>
     <a class="btn gold" href="submit.html">Apni shop list karen</a>
     <a class="btn ghost" href="rules.html">Bond kaise kaam karta hai?</a>
   </section>
 
-  <div class="counters">
-    <div class="stat"><b id="c-shops">–</b><span>Protected shops</span></div>
-    <div class="stat"><b id="c-bond">–</b><span>Total trust bonds held</span></div>
-    <div class="stat"><b id="c-cats">12</b><span>Category boards</span></div>
+  <div class="preview">
+    <div class="preview-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span>ShoppingOye — live board preview</span></div>
+    <div class="preview-body">
+      <div class="counters">
+        <div class="stat"><b id="c-shops">–</b><span>Protected shops</span></div>
+        <div class="stat"><b id="c-bond">–</b><span>Total trust bonds held</span></div>
+        <div class="stat"><b id="c-cats">12</b><span>Category boards</span></div>
+      </div>
+      <h3>Top bonded shops (all categories)</h3>
+      <div id="top-shops"></div>
+    </div>
   </div>
 
-  <h2>Category boards</h2>
+  <h2 class="section-head">Category boards</h2>
+  <p class="section-sub">Apni pasand ki category kholen, shops ko bond aur boost ke hisaab se rank par dekhen.</p>
   <input id="shop-search" class="searchbox" placeholder="Search shops ya categories... (jaise: watch, silver, lawn)">
   <div class="grid" id="cat-grid"></div>
 
-  <h2>Top bonded shops (all categories)</h2>
-  <div id="top-shops"></div>
-
-  <h2>Kaise kaam karta hai</h2>
+  <h2 class="section-head">Kaise kaam karta hai</h2>
+  <p class="section-sub">Teen seedhe steps, koi chhupi hui shart nahi.</p>
   <div class="steps">
     <div class="step"><b>1</b><h3>Shop bond jama karwati hai</h3><p>Rs 2,000 se 20,000 tak refundable bond. Ye amanat hai, hamari kamai nahi.</p></div>
     <div class="step"><b>2</b><h3>Total boost se rank milti hai</h3><p>Rank aap ke total boost se banti hai, jo aik dafa di gayi raqam hamesha aap ke total me rehti hai. Top position ke liye top wali raqam se sirf Rs 1,000 zyada total chahiye. Pehli dafa poori raqam, dobara sirf farq.</p></div>
     <div class="step"><b>3</b><h3>Fraud par bond se refund</h3><p>Complaint par seller ko 7 din milte hain. Hal na ho to bond se buyer ko refund.</p></div>
+  </div>
+
+  <div class="peach-panel">
+    <h2>Trust Bond kya hai?</h2>
+    <p>Trust Bond shop ki neeyat ka saboot hai. Shop bond jama karwati hai, admin payment verify karta hai, phir shop board par aati hai. Agar shop buyer ke saath ghalat kare to buyer ko usi bond se refund milta hai, bond ki raqam ki had tak. Bond amanat hai, refundable hai, aur board ki kamai nahi.</p>
+    <p><a class="btn" href="rules.html">Poori policy parhen</a></p>
   </div>
 </div>
 <footer class="site"><div class="wrap">

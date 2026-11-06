@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Seller Dashboard — ShoppingOye</title>
-<link rel="stylesheet" href="assets/style.css?v=8">
+<link rel="stylesheet" href="assets/style.css?v=9">
 <link rel="icon" type="image/svg+xml" href="assets/logo-mark.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-/* Dashboard-only styles (Phase 15). The main design system stays in style.css. */
-.dash-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);margin-bottom:16px}
+/* Dashboard-only styles (Phase 15, Moonwalk polish 2026-11-06). The main design system stays in style.css. */
+.dash-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;box-shadow:var(--shadow);margin-bottom:16px}
 .dash-card h3{margin-top:0}
 .muted{color:var(--muted);font-size:14px}
 .auth-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
@@ -228,7 +228,7 @@ function renderProducts(){
   const prods = productsForShop(selectedShopId);
   box.innerHTML = prods.length ? prods.map(p => `
     <div class="prow">
-      ${p.img ? `<img src="${p.img}" alt="${p.name}" loading="lazy" onerror="this.remove()">` : `<div style="width:64px;height:64px;min-width:64px;border-radius:8px;background:linear-gradient(135deg,#F9FAFB,#BAE6FD);display:flex;align-items:center;justify-content:center;font-size:26px">📦</div>`}
+      ${p.img ? `<img src="${p.img}" alt="${p.name}" loading="lazy" onerror="this.remove()">` : `<div style="width:64px;height:64px;min-width:64px;border-radius:8px;background:linear-gradient(135deg,#FAF8F4,#FFF5E5);display:flex;align-items:center;justify-content:center;font-size:26px">📦</div>`}
       <div class="grow"><b>${p.name}</b><p>${p.tag} · ${money(p.price)}</p></div>
       <button class="btn ghost" data-edit="${p.id}">Edit</button>
       <button class="btn danger" data-del="${p.id}" data-name="${p.name}">Delete</button>
