@@ -98,8 +98,8 @@
   Boost payment manual hai, admin se WhatsApp par hoti hai. Bond money amanat hai aur clean exit par refund hoti hai (10% platform fee minus).
 </div></footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="assets/supabase.js"></script>
-<script src="assets/data.js"></script>
+<script src="assets/supabase.js?v=2"></script>
+<script src="assets/data.js?v=2"></script>
 <script>
 /* Admin ka WhatsApp number (digits only, country code ke saath, e.g. "923001234567").
    Abhi khaali hai, is liye boost wala WhatsApp button nahi dikhega.
@@ -348,7 +348,7 @@ document.getElementById("auth-form").addEventListener("submit", async (e) => {
     if(error){ showMsg(msg, friendlyAuthError(error.message)); return; }
     hideMsg(msg);
   } catch(err) {
-    showMsg(msg, "Sign in nahi ho saka, internet check kar ke dobara try karen.");
+    showMsg(msg, "Sign in nahi ho saka (" + (err && err.message ? err.message : "unknown error") + "). Dobara try karen.");
   } finally {
     btn.disabled = false; btn.textContent = "Sign in";
   }
@@ -365,7 +365,7 @@ document.getElementById("btn-signup").addEventListener("click", async () => {
     if(data && data.session){ hideMsg(msg); return; }
     showMsg(msg, "Account ban gaya hai. Email confirm karen: inbox me confirmation link aaya hoga, us par click karen, phir yahan sign in karen.");
   } catch(err) {
-    showMsg(msg, "Account nahi ban saka, internet check kar ke dobara try karen.");
+    showMsg(msg, "Account nahi ban saka (" + (err && err.message ? err.message : "unknown error") + "). Dobara try karen.");
   }
 });
 
@@ -378,7 +378,7 @@ document.getElementById("btn-reset").addEventListener("click", async () => {
     if(error){ showMsg(msg, friendlyAuthError(error.message)); return; }
     showMsg(msg, "Reset link bhej diya hai (agar is email par account hai to). Inbox check karen.");
   } catch(err) {
-    showMsg(msg, "Reset link nahi bheja ja saka, internet check kar ke dobara try karen.");
+    showMsg(msg, "Reset link nahi bheja ja saka (" + (err && err.message ? err.message : "unknown error") + "). Dobara try karen.");
   }
 });
 
