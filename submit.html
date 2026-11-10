@@ -4,11 +4,26 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>List Your Shop — ShoppingOye</title>
-<link rel="stylesheet" href="assets/style.css?v=10">
+<link rel="stylesheet" href="assets/style.css?v=11">
 <link rel="icon" type="image/svg+xml" href="assets/logo-mark.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script>
+try{var t=localStorage.getItem("so-theme");if(t==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}
+document.addEventListener("DOMContentLoaded",function(){
+  var b=document.getElementById("theme-toggle");
+  if(!b)return;
+  var sync=function(){var d=document.documentElement.getAttribute("data-theme")==="dark";b.textContent=d?"☀️":"🌙";b.setAttribute("aria-label",d?"Switch to light mode":"Switch to dark mode");b.title=b.getAttribute("aria-label");};
+  sync();
+  b.addEventListener("click",function(){
+    var d=document.documentElement.getAttribute("data-theme")==="dark";
+    if(d){document.documentElement.removeAttribute("data-theme");try{localStorage.setItem("so-theme","light");}catch(e){}}
+    else{document.documentElement.setAttribute("data-theme","dark");try{localStorage.setItem("so-theme","dark");}catch(e){}}
+    sync();
+  });
+});
+</script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -18,7 +33,7 @@
     <a class="cta" href="submit.html">List Your Shop</a>
     <a href="dispute.html">Complaint</a>
     <a href="rules.html">Rules</a>
-    <a href="dashboard.html">Seller login</a>
+    <a href="dashboard.html">Seller login</a> <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode" title="Switch to dark mode">🌙</button>
   </nav>
 </div></header>
 <div class="wrap">
@@ -59,7 +74,7 @@
   Bond money is amanat: refundable on clean exit minus a 10% platform fee. One-time verification fee Rs 500–1,000 applies on approval.
 </div></footer>
 <script src="assets/supabase.js"></script>
-<script src="assets/data.js"></script>
+<script src="assets/data.js?v=3"></script>
 <script>
 document.getElementById("f-cat").innerHTML = CATEGORIES.map(c => `<option value="${c.slug}">${c.name}</option>`).join("");
 document.getElementById("submit-form").addEventListener("submit", async function(e){

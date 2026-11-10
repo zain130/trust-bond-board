@@ -4,11 +4,26 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Shop — ShoppingOye</title>
-<link rel="stylesheet" href="assets/style.css?v=10">
+<link rel="stylesheet" href="assets/style.css?v=11">
 <link rel="icon" type="image/svg+xml" href="assets/logo-mark.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script>
+try{var t=localStorage.getItem("so-theme");if(t==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}
+document.addEventListener("DOMContentLoaded",function(){
+  var b=document.getElementById("theme-toggle");
+  if(!b)return;
+  var sync=function(){var d=document.documentElement.getAttribute("data-theme")==="dark";b.textContent=d?"☀️":"🌙";b.setAttribute("aria-label",d?"Switch to light mode":"Switch to dark mode");b.title=b.getAttribute("aria-label");};
+  sync();
+  b.addEventListener("click",function(){
+    var d=document.documentElement.getAttribute("data-theme")==="dark";
+    if(d){document.documentElement.removeAttribute("data-theme");try{localStorage.setItem("so-theme","light");}catch(e){}}
+    else{document.documentElement.setAttribute("data-theme","dark");try{localStorage.setItem("so-theme","dark");}catch(e){}}
+    sync();
+  });
+});
+</script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -18,7 +33,7 @@
     <a class="cta" href="submit.html">List Your Shop</a>
     <a href="dispute.html">Complaint</a>
     <a href="rules.html">Rules</a>
-    <a href="dashboard.html">Seller login</a>
+    <a href="dashboard.html">Seller login</a> <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode" title="Switch to dark mode">🌙</button>
   </nav>
 </div></header>
 <div class="wrap">
@@ -29,7 +44,7 @@
   If this shop does not deliver or sends the wrong item, file a complaint within 7 days and the bond covers your refund.
 </div></footer>
 <script src="assets/supabase.js"></script>
-<script src="assets/data.js"></script>
+<script src="assets/data.js?v=3"></script>
 <script>
 function render(){
 const id = param("id");
@@ -53,6 +68,11 @@ if(!s){
       ${waDigits ? `<div class="actions"><a class="btn wa" href="${waLink("Hi, I want to order " + p.name + " (" + money(p.price) + ") from " + s.name + ".")}">Order this</a></div>` : `<p style="font-size:13px">Order ke liye shop ka WhatsApp jald aa raha hai.</p>`}
     </div>`).join("")}</div>`
     : "<p>No products listed yet.</p>";
+  const also = rankedShops(s.cat).filter(x => x.id !== s.id).slice(0, 5);
+  const alsoHtml = also.length ? `<h3>Also in ${cat.name}</h3><ul class="also-list">${also.map((x) => {
+    const r = rankedShops(s.cat).findIndex(y => y.id === x.id) + 1;
+    return `<li><span class="ranknum ${r===1?"r1":r===2?"r2":r===3?"r3":""}">#${r}</span><a href="shop.html?id=${x.id}">${x.name}</a><span class="boost">${money(x.boost)}</span></li>`;
+  }).join("")}</ul><p><a href="board.html?cat=${s.cat}">See all in ${cat.name}</a></p>` : "";
   document.title = s.name + " — ShoppingOye";
   document.getElementById("shop-box").innerHTML = `
     <div class="shop-hero">
@@ -65,18 +85,38 @@ if(!s){
     </div>
     <div class="counters">
       <div class="stat"><b>#${rank}</b><span>Rank in ${cat.name}</span></div>
+      <div class="stat"><b>#${overallRank(s.id)} of ${SHOPS.length}</b><span>Rank overall (all boards)</span></div>
       <div class="stat"><b>${money(s.bond)}</b><span>Trust bond (refundable)</span></div>
       <div class="stat"><b>${money(s.boost)}</b><span>Total boost paid</span></div>
       <div class="stat"><b>${s.orders}</b><span>Orders served</span></div>
     </div>
-    ${waDigits ? `<p><a class="btn wa" href="${waLink("Hi " + s.name + ", I want to order from ShoppingOye.")}">Order on WhatsApp</a></p>` : ""}
+    <p>${waDigits ? `<a class="btn wa" href="${waLink("Hi " + s.name + ", I want to order from ShoppingOye.")}">Order on WhatsApp</a> ` : ""}<button class="btn ghost" id="copy-link" type="button">Copy link</button></p>
     ${rank > 1 ? `<p class="climb">${s.boost > 0 ? `Top position ke liye total ${money(topTotal + 1000)} chahiye. Is shop ne pehle ${money(s.boost)} boost diya hua hai, jo count hoga, is liye sirf ${money(need)} ka farq dena hoga.` : `Top position claim karne ke liye ${money(topTotal + 1000)} chahiye (pehli dafa poori raqam).`}</p>` : `<p class="climb">🏆 Ye shop is board par #1 par hai.</p>`}
+    <p class="climb">Anyone can take this rank for ${money(s.boost + 1000)} on the ${cat.name} board.</p>
     <h3>Products (${prods.length})</h3>
     ${prodHtml}
+    ${alsoHtml}
     <p style="margin-top:20px"><a class="btn" href="dispute.html?shop=${s.id}">File a complaint about this shop</a>
+       <a class="btn ghost" href="board.html?cat=${s.cat}#shop-${s.id}">See category ranking</a>
+       <a class="btn ghost" href="index.html#top-shops">See overall ranking</a>
        <a class="btn ghost" href="board.html?cat=${s.cat}">Back to ${cat.name} board</a>
        <a class="btn ghost" href="manage.html?shop=${s.id}">Manage this shop</a></p>
     ${waDigits ? "" : `<p style="color:var(--muted);font-size:14px">Demo listing: WhatsApp ordering activates when the real shop joins with a verified bond.</p>`}`;
+  const copyBtn = document.getElementById("copy-link");
+  if(copyBtn){
+    copyBtn.addEventListener("click", function(){
+      const url = location.href;
+      const done = function(){ copyBtn.textContent = "Link copied ✓"; setTimeout(function(){ copyBtn.textContent = "Copy link"; }, 2000); };
+      const fallbackCopy = function(text){
+        const ta = document.createElement("textarea");
+        ta.value = text; document.body.appendChild(ta); ta.select();
+        try{ document.execCommand("copy"); }catch(e){}
+        document.body.removeChild(ta);
+      };
+      if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(done, function(){ fallbackCopy(url); done(); }); }
+      else { fallbackCopy(url); done(); }
+    });
+  }
 }
 }
 render();
