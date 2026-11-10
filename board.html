@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Category Board — ShoppingOye</title>
-<link rel="stylesheet" href="assets/style.css?v=9">
+<link rel="stylesheet" href="assets/style.css?v=10">
 <link rel="icon" type="image/svg+xml" href="assets/logo-mark.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -53,7 +53,7 @@ if(!cat){
   <thead><tr><th>Rank</th><th>Shop</th><th class="num">Trust bond</th><th class="num">Total boost paid</th><th class="num">Orders</th><th></th></tr></thead>
   <tbody>${shops.map((s,i) => `
     <tr>
-      <td><span class="ranknum ${i===0?"r1":i===1?"r2":i===2?"r3":""}">#${i+1}</span></td>
+      <td><span class="ranknum ${i===0?"r1":i===1?"r2":i===2?"r3":""}" tabindex="0">#${i+1}<span class="claim-tip">Claim this ranking for ${money(s.boost + 1000)}</span></span></td>
       <td><div class="shopcell"><div class="miniavatar">${s.name.charAt(0).toUpperCase()}</div><div><a href="shop.html?id=${s.id}">${s.name}</a><span>${s.tag} · ${s.city} · ${s.handle}</span></div></div></td>
       <td class="num"><b>${money(s.bond)}</b>${s.bondVerified ? ` <span class="badge">✓ Bond Protected</span>` : ""}</td>
       <td class="num"><b>${money(s.boost)}</b></td>
