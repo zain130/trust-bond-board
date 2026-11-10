@@ -99,3 +99,17 @@ function param(name){
   const m = new URLSearchParams(location.search).get(name);
   return m ? decodeURIComponent(m) : null;
 }
+
+/* ---- Phase 19 (outbid-style board helpers) ---- */
+function claimPrice(shop){ return shop.boost + 1000; } /* price to take this shop's rank */
+function rankForAmount(shops, amount){
+  /* Rank a new amount would buy on this board. Ties go below the older listing. */
+  let r = 1;
+  for(const s of shops){ if(s.boost >= amount) r++; }
+  return r;
+}
+function overallRank(shopId){
+  const all = SHOPS.slice().sort((a,b) => (b.boost - a.boost) || (b.bond - a.bond));
+  return all.findIndex(s => s.id === shopId) + 1;
+}
+function topInCategory(catSlug, n){ return rankedShops(catSlug).slice(0, n); }
