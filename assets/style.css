@@ -130,7 +130,8 @@ table.lb td.num,table.lb th.num{text-align:right;font-variant-numeric:tabular-nu
 /* ---- Claim tooltip: hover (or tap / keyboard focus) a rank number to see its claim price ---- */
 .claim-tip{position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%) translateX(6px);background:#1C1C1C;color:#fff;font-size:12px;font-weight:600;line-height:1.35;padding:8px 12px;border-radius:9px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .18s ease,transform .18s ease;z-index:30;box-shadow:0 10px 24px rgba(28,28,28,.22)}
 .claim-tip::after{content:"";position:absolute;right:100%;top:50%;transform:translateY(-50%);border:6px solid transparent;border-right-color:#1C1C1C}
-.ranknum:hover .claim-tip,.ranknum:focus .claim-tip,.ranknum:focus-visible .claim-tip,.shoprow .rank:hover .claim-tip,.shoprow .rank:focus .claim-tip,.shoprow .rank:focus-visible .claim-tip{opacity:1;transform:translateY(-50%) translateX(0)}
+.ranknum:hover .claim-tip,.ranknum:focus .claim-tip,.ranknum:focus-visible .claim-tip,.shoprow .rank:hover .claim-tip,.shoprow .rank:focus .claim-tip,.shoprow .rank:focus-visible .claim-tip{opacity:1;transform:translateY(-50%) translateX(0);pointer-events:auto}
+.shoprow:hover .claim-tip{opacity:1;transform:translateY(-50%) translateX(0);pointer-events:auto}
 .ranknum:focus,.shoprow .rank:focus{outline:none}
 .shopcell{display:flex;gap:12px;align-items:center}
 .miniavatar{width:44px;height:44px;min-width:44px;border-radius:12px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800}
@@ -221,3 +222,89 @@ footer.site a{color:#fff}
 
 /* ---- Logo ---- */
 .logo img{height:38px;width:auto;display:block}
+
+/* ---- Phase 19 (outbid-style board features) ---- */
+
+/* Dark mode: same Moonwalk system, dark surfaces. Toggled by the header
+   button, persisted in localStorage, applied via data-theme on <html>. */
+html[data-theme="dark"]{
+  --bg:#161513; --surface:#211F1C; --surface-2:#2A2723;
+  --border:#3A352E; --border-strong:#4A443A;
+  --text:#F5F1E8; --muted:#B8B0A2; --muted-2:#8A8275;
+  --accent:#F95608; --accent-dark:#FF6B26; --accent-soft:#3A2415; --accent-border:#5A3A1E;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);
+  --green:#3A2415; --green-dark:#5A3A1E; --green-soft:#3A2415;
+  --gold:#3A2415; --gold-soft:#3A2415; --gold-border:#5A3A1E;
+  --mint:#3A2415; --lav:#3A2415; --sky:#3A2415; --amber:#3A2415;
+}
+html[data-theme="dark"] header.site{background:rgba(22,21,19,.92)}
+html[data-theme="dark"] nav.main a:hover{background:#2A2723}
+html[data-theme="dark"] table.lb tbody tr:hover{background:#2A2723}
+html[data-theme="dark"] input,html[data-theme="dark"] select,html[data-theme="dark"] textarea{background:#211F1C}
+html[data-theme="dark"] .btn.ghost{background:#211F1C}
+html[data-theme="dark"] .btn.ghost:hover{background:#2A2723}
+html[data-theme="dark"] .pimg{background:linear-gradient(135deg,#211F1C,#3A2415)}
+html[data-theme="dark"] footer.site{background:#0E0D0C;color:#8A8275}
+html[data-theme="dark"] .claim-tip{background:#F5F1E8;color:#1C1C1C}
+html[data-theme="dark"] .claim-tip::after{border-right-color:#F5F1E8}
+.theme-toggle{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:7px 11px;font-size:15px;cursor:pointer;line-height:1}
+.theme-toggle:hover{background:#F1EBE1}
+html[data-theme="dark"] .theme-toggle:hover{background:#2A2723}
+
+/* Claim calculator (board hero, outbid-style) */
+.claim-box{background:var(--surface);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow);padding:28px 28px 24px;margin:20px 0;text-align:center}
+.claim-box h2{margin:0 0 6px;font-size:28px}
+.claim-box h2 .claim-amount-text{color:var(--accent)}
+.claim-places{color:var(--muted);font-size:15px;margin:0 0 18px}
+.claim-controls{display:flex;align-items:center;justify-content:center;gap:10px;margin:0 0 14px}
+.claim-controls button{width:44px;height:44px;border-radius:10px;border:1px solid var(--border-strong);background:var(--surface);font-size:20px;font-weight:800;cursor:pointer;color:var(--text)}
+.claim-controls button:hover{border-color:var(--accent);color:var(--accent)}
+.claim-controls input{width:190px;text-align:center;font-size:20px;font-weight:800;padding:10px 12px}
+.claim-note{color:var(--muted);font-size:13px;margin:0 0 16px}
+.claim-box .btn{margin:0 4px}
+
+/* Confirm modal (claim flow) */
+.modal-backdrop{position:fixed;inset:0;background:rgba(28,28,28,.55);backdrop-filter:blur(3px);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-backdrop[hidden]{display:none}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow);max-width:480px;width:100%;padding:28px;position:relative;text-align:left}
+.modal h3{margin:0 0 10px;font-size:22px}
+.modal p{color:var(--muted);font-size:15px}
+.modal p b{color:var(--text)}
+.modal-x{position:absolute;top:14px;right:16px;background:none;border:none;font-size:24px;cursor:pointer;color:var(--muted);line-height:1;padding:4px}
+.modal-check{display:flex;gap:10px;align-items:flex-start;font-size:14px;font-weight:600;margin:18px 0;cursor:pointer}
+.modal-check input{width:auto;margin-top:3px;accent-color:var(--accent)}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end}
+.modal-note{font-size:13px!important;margin-top:16px}
+
+/* Row-hover claim pill: the claim-tip button also appears on row hover,
+   and it is clickable (sets the calculator amount). */
+table.lb tbody tr{position:relative}
+.claim-tip{cursor:pointer;font-family:inherit}
+tr:hover .claim-tip,tr:focus-within .claim-tip{opacity:1;transform:translateY(-50%) translateX(0);pointer-events:auto}
+table.lb tbody tr.top3{background:var(--accent-soft)}
+table.lb tbody tr.top3:hover{background:#FDEBD9}
+html[data-theme="dark"] table.lb tbody tr.top3:hover{background:#4A2E18}
+tr.lb-div td{text-align:center;color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:10px 18px!important;background:var(--surface-2)}
+tr.flash{animation:rowflash 2.4s ease}
+@keyframes rowflash{0%,100%{background:transparent}20%,60%{background:var(--accent-soft)}}
+.shopcell .desc{display:block;color:var(--muted);font-size:13px;font-weight:400;margin-top:2px;max-width:420px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Pagination */
+.pager{display:flex;align-items:center;justify-content:center;gap:6px;margin:20px 0;flex-wrap:wrap}
+.pager button{min-width:38px;height:38px;padding:0 12px;border-radius:9px;border:1px solid var(--border);background:var(--surface);font-weight:700;font-size:14px;cursor:pointer;color:var(--text)}
+.pager button:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.pager button.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.pager button:disabled{opacity:.45;cursor:default}
+.pager .info{width:100%;text-align:center;color:var(--muted);font-size:13px;margin-top:4px}
+
+/* Shop page: also-in list */
+.also-list{list-style:none;margin:12px 0;padding:0}
+.also-list li{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:8px}
+.also-list li .ranknum{width:32px;height:32px;font-size:13px}
+.also-list li a{font-weight:700}
+.also-list li .boost{margin-left:auto;color:var(--muted);font-size:14px;font-weight:700;white-space:nowrap}
+
+/* Category cards: top-3 leaders (outbid /categories style) */
+.leaders{margin-top:10px;border-top:1px solid var(--border);padding-top:10px}
+.leaders span{display:block;font-size:13px;color:var(--muted);padding:2px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.leaders b{color:var(--text)}

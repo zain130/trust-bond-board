@@ -4,11 +4,26 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Category Board — ShoppingOye</title>
-<link rel="stylesheet" href="assets/style.css?v=10">
+<link rel="stylesheet" href="assets/style.css?v=11">
 <link rel="icon" type="image/svg+xml" href="assets/logo-mark.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script>
+try{var t=localStorage.getItem("so-theme");if(t==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}
+document.addEventListener("DOMContentLoaded",function(){
+  var b=document.getElementById("theme-toggle");
+  if(!b)return;
+  var sync=function(){var d=document.documentElement.getAttribute("data-theme")==="dark";b.textContent=d?"☀️":"🌙";b.setAttribute("aria-label",d?"Switch to light mode":"Switch to dark mode");b.title=b.getAttribute("aria-label");};
+  sync();
+  b.addEventListener("click",function(){
+    var d=document.documentElement.getAttribute("data-theme")==="dark";
+    if(d){document.documentElement.removeAttribute("data-theme");try{localStorage.setItem("so-theme","light");}catch(e){}}
+    else{document.documentElement.setAttribute("data-theme","dark");try{localStorage.setItem("so-theme","dark");}catch(e){}}
+    sync();
+  });
+});
+</script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -19,50 +34,209 @@
     <a href="dispute.html">Complaint</a>
     <a href="rules.html">Rules</a>
     <a href="dashboard.html">Seller login</a>
+    <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode" title="Switch to dark mode">🌙</button>
   </nav>
 </div></header>
 <div class="wrap">
   <div class="demo"><b>Demo version:</b> listings below are sample data. <a href="submit.html">List your shop</a> to join the real board.</div>
   <h2 id="board-title">Board</h2>
   <p id="board-sub" style="color:var(--muted)"></p>
+
+  <div class="claim-box" id="claim-box">
+    <h2>Claim <span id="claim-rank">#1</span> for <span class="claim-amount-text" id="claim-price">Rs 1,000</span></h2>
+    <p class="claim-places" id="claim-places">Places you #1 on this board.</p>
+    <div class="claim-controls">
+      <button type="button" id="claim-minus" aria-label="Decrease amount by Rs 1,000">−</button>
+      <input id="claim-amount" type="number" min="1000" step="1000" value="1000" aria-label="Amount in rupees">
+      <button type="button" id="claim-plus" aria-label="Increase amount by Rs 1,000">+</button>
+    </div>
+    <p class="claim-note">Your amount stays on the board — it is not a subscription. Boost is lifetime cumulative: your earlier boost always counts, you only pay the difference.</p>
+    <button class="btn" id="claim-open" type="button">Claim rank</button>
+  </div>
+
   <div class="climb" id="board-climb"></div>
+  <input id="board-search" class="searchbox" placeholder="Search shops on this board...">
   <div id="board-list"></div>
+  <div class="pager" id="board-pager"></div>
   <p><a class="btn" href="submit.html">Is board par apni shop list karen</a></p>
+</div>
+<div class="modal-backdrop" id="claim-modal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="claim-modal-title">
+    <button class="modal-x" id="claim-close" type="button" aria-label="Close">×</button>
+    <h3 id="claim-modal-title">Confirm this rank</h3>
+    <p>Check the rank and price, then agree to the rules to continue. A listing at that rank on the public board. It goes live when the boost is confirmed. Someone else can claim a higher rank.</p>
+    <p><b>Rank <span id="modal-rank">#1</span></b> · <span id="modal-cat"></span><br>Price <b id="modal-price">Rs 1,000</b> — Due now</p>
+    <label class="modal-check"><input type="checkbox" id="modal-agree"> I have read and agree to the <a href="rules.html">rules</a> of ShoppingOye.</label>
+    <div class="modal-actions">
+      <button class="btn ghost" id="claim-cancel" type="button">Cancel</button>
+      <button class="btn" id="claim-continue" type="button" disabled>Continue</button>
+    </div>
+    <p class="modal-note">Boost is arranged with the admin on WhatsApp. New shop? <a href="submit.html">List your shop</a> first, then top up the boost from your seller dashboard.</p>
+  </div>
 </div>
 <footer class="site"><div class="wrap">
   Rank = total boost paid (cumulative, non-refundable). Top claim = current top + Rs 1,000. Bond = refundable trust deposit shown on every shop. Sponsored ranks are labelled.
 </div></footer>
 <script src="assets/supabase.js"></script>
-<script src="assets/data.js"></script>
+<script src="assets/data.js?v=3"></script>
 <script>
-function render(){
-const slug = param("cat");
-const cat = catBySlug(slug);
-if(!cat){
-  document.getElementById("board-title").textContent = "Category not found";
-  document.getElementById("board-sub").textContent = "Go back to the homepage and pick a category board.";
-} else {
-  document.title = cat.name + " — ShoppingOye";
-  document.getElementById("board-title").textContent = cat.icon + " " + cat.name;
-  document.getElementById("board-sub").textContent = "Subcategories: " + cat.subs.join(" · ");
-  const shops = rankedShops(slug);
-  const top = shops[0];
-  document.getElementById("board-climb").textContent = top ? `🏆 Claim the top position in the leaderboard for ${money(top.boost + 1000)}. Pehli dafa top lene wale ko poori raqam deni hogi. Jis shop ne pehle boost diya hua hai, us ki pehli raqam count hogi, sirf farq dena hoga.` : "Is board par pehli shop bano!";
-  document.getElementById("board-list").innerHTML = shops.length ? `
+const PAGE_SIZE = 10;
+let boardShops = [];
+let boardCat = null;
+let boardPage = 1;
+let boardQuery = "";
+let claimTouched = false;
+
+const amountInput = document.getElementById("claim-amount");
+
+function claimDefault(){ const top = boardShops[0]; return top ? top.boost + 1000 : 1000; }
+function claimAmount(){
+  const v = parseInt(amountInput.value, 10);
+  return (isNaN(v) || v < 1000) ? 1000 : v;
+}
+function updateClaim(){
+  const amt = claimAmount();
+  const rank = rankForAmount(boardShops, amt);
+  document.getElementById("claim-rank").textContent = "#" + rank;
+  document.getElementById("claim-price").textContent = money(amt);
+  document.getElementById("claim-places").textContent = "Places you #" + rank + " on this board.";
+}
+function setClaimAmount(amt){
+  amountInput.value = amt;
+  claimTouched = true;
+  updateClaim();
+}
+amountInput.addEventListener("input", function(){ claimTouched = true; updateClaim(); });
+amountInput.addEventListener("change", function(){ amountInput.value = claimAmount(); updateClaim(); });
+document.getElementById("claim-minus").addEventListener("click", function(){ setClaimAmount(Math.max(1000, claimAmount() - 1000)); });
+document.getElementById("claim-plus").addEventListener("click", function(){ setClaimAmount(claimAmount() + 1000); });
+
+/* Claim modal */
+const modal = document.getElementById("claim-modal");
+const agreeBox = document.getElementById("modal-agree");
+const continueBtn = document.getElementById("claim-continue");
+function openModal(){
+  const amt = claimAmount();
+  document.getElementById("modal-rank").textContent = "#" + rankForAmount(boardShops, amt);
+  document.getElementById("modal-cat").textContent = boardCat ? boardCat.name : "";
+  document.getElementById("modal-price").textContent = money(amt);
+  agreeBox.checked = false;
+  continueBtn.disabled = true;
+  modal.hidden = false;
+}
+function closeModal(){ modal.hidden = true; }
+document.getElementById("claim-open").addEventListener("click", openModal);
+document.getElementById("claim-close").addEventListener("click", closeModal);
+document.getElementById("claim-cancel").addEventListener("click", closeModal);
+modal.addEventListener("click", function(e){ if(e.target === modal) closeModal(); });
+document.addEventListener("keydown", function(e){ if(e.key === "Escape" && !modal.hidden) closeModal(); });
+agreeBox.addEventListener("change", function(){ continueBtn.disabled = !agreeBox.checked; });
+continueBtn.addEventListener("click", function(){ location.href = "dashboard.html"; });
+
+/* Board search */
+document.getElementById("board-search").addEventListener("input", function(e){
+  boardQuery = e.target.value.toLowerCase().trim();
+  boardPage = 1;
+  renderTable();
+});
+
+/* Row claim-pill clicks (event delegation: rows re-render on page/search). */
+document.getElementById("board-list").addEventListener("click", function(e){
+  const pill = e.target.closest(".claim-tip");
+  if(!pill) return;
+  setClaimAmount(parseInt(pill.getAttribute("data-claim"), 10));
+  document.getElementById("claim-box").scrollIntoView({behavior:"smooth", block:"center"});
+  amountInput.focus();
+});
+
+function filteredShops(){
+  if(!boardQuery) return boardShops;
+  return boardShops.filter(s => [s.name, s.tag, s.city, s.handle, s.desc].filter(x => x).join(" ").toLowerCase().includes(boardQuery));
+}
+function renderTable(){
+  const list = filteredShops();
+  const pages = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
+  if(boardPage > pages) boardPage = pages;
+  const start = (boardPage - 1) * PAGE_SIZE;
+  const slice = list.slice(start, start + PAGE_SIZE);
+  const total = list.length;
+  document.getElementById("board-list").innerHTML = slice.length ? `
   <div class="tablewrap"><table class="lb">
   <thead><tr><th>Rank</th><th>Shop</th><th class="num">Trust bond</th><th class="num">Total boost paid</th><th class="num">Orders</th><th></th></tr></thead>
-  <tbody>${shops.map((s,i) => `
-    <tr>
-      <td><span class="ranknum ${i===0?"r1":i===1?"r2":i===2?"r3":""}" tabindex="0">#${i+1}<span class="claim-tip">Claim this ranking for ${money(s.boost + 1000)}</span></span></td>
-      <td><div class="shopcell"><div class="miniavatar">${s.name.charAt(0).toUpperCase()}</div><div><a href="shop.html?id=${s.id}">${s.name}</a><span>${s.tag} · ${s.city} · ${s.handle}</span></div></div></td>
+  <tbody>${slice.map((s) => {
+    const boardRank = boardShops.indexOf(s) + 1;
+    const price = claimPrice(s);
+    let row = `
+    <tr id="shop-${s.id}"${boardRank <= 3 ? ` class="top3"` : ""}>
+      <td><span class="ranknum ${boardRank===1?"r1":boardRank===2?"r2":boardRank===3?"r3":""}" tabindex="0">#${boardRank}<button type="button" class="claim-tip" data-claim="${price}">Claim this ranking for ${money(price)}</button></span></td>
+      <td><div class="shopcell"><div class="miniavatar">${s.name.charAt(0).toUpperCase()}</div><div><a href="shop.html?id=${s.id}">${s.name}</a><span>${s.tag} · ${s.city} · ${s.handle}</span>${s.desc ? `<span class="desc">${s.desc}</span>` : ""}</div></div></td>
       <td class="num"><b>${money(s.bond)}</b>${s.bondVerified ? ` <span class="badge">✓ Bond Protected</span>` : ""}</td>
       <td class="num"><b>${money(s.boost)}</b></td>
       <td class="num">${s.orders}</td>
       <td><a class="btn small" href="shop.html?id=${s.id}">View shop</a></td>
-    </tr>`).join("")}</tbody>
+    </tr>`;
+    if((boardRank === 10 || boardRank === 20) && total > boardRank){
+      row += `<tr class="lb-div"><td colspan="6">Top ${boardRank}</td></tr>`;
+    }
+    return row;
+  }).join("")}</tbody>
   </table></div>`
-    : "<p>No shops on this board yet. Be the first — <a href='submit.html'>list your shop</a>.</p>";
+    : "<p>No shops match this search.</p>";
+  /* Pagination */
+  const pager = document.getElementById("board-pager");
+  let nums = [];
+  for(let p = 1; p <= pages; p++){
+    if(pages <= 7 || p === 1 || p === pages || Math.abs(p - boardPage) <= 1){ nums.push(p); }
+    else if(nums[nums.length - 1] !== "…"){ nums.push("…"); }
+  }
+  pager.innerHTML = (pages > 1 ? `<button type="button" id="pg-prev"${boardPage === 1 ? " disabled" : ""}>‹ Prev</button>` : "")
+    + nums.map(p => p === "…" ? `<button type="button" disabled>…</button>` : `<button type="button" data-page="${p}"${p === boardPage ? ` class="active"` : ""}>${p}</button>`).join("")
+    + (pages > 1 ? `<button type="button" id="pg-next"${boardPage === pages ? " disabled" : ""}>Next ›</button>` : "")
+    + `<span class="info">${total ? (start + 1) + "–" + Math.min(start + PAGE_SIZE, total) + " of " + total + " shops" : "0 shops on this board"}</span>`;
+  const prev = document.getElementById("pg-prev");
+  if(prev) prev.addEventListener("click", function(){ boardPage--; renderTable(); });
+  const next = document.getElementById("pg-next");
+  if(next) next.addEventListener("click", function(){ boardPage++; renderTable(); });
+  pager.querySelectorAll("[data-page]").forEach(b => b.addEventListener("click", function(){
+    boardPage = parseInt(b.getAttribute("data-page"), 10); renderTable();
+  }));
 }
+
+function render(){
+  const slug = param("cat");
+  boardCat = catBySlug(slug);
+  if(!boardCat){
+    document.getElementById("board-title").textContent = "Category not found";
+    document.getElementById("board-sub").textContent = "Go back to the homepage and pick a category board.";
+    document.getElementById("board-list").innerHTML = "";
+    document.getElementById("board-pager").innerHTML = "";
+  } else {
+    document.title = boardCat.name + " — ShoppingOye";
+    document.getElementById("board-title").textContent = boardCat.icon + " " + boardCat.name;
+    document.getElementById("board-sub").textContent = "Subcategories: " + boardCat.subs.join(" · ");
+    boardShops = rankedShops(slug);
+    const top = boardShops[0];
+    document.getElementById("board-climb").textContent = top ? `🏆 Claim the top position in the leaderboard for ${money(top.boost + 1000)}. Pehli dafa top lene wale ko poori raqam deni hogi. Jis shop ne pehle boost diya hua hai, us ki pehli raqam count hogi, sirf farq dena hoga.` : "Is board par pehli shop bano!";
+    if(!claimTouched){
+      const preset = param("claim");
+      const presetAmt = preset ? parseInt(preset, 10) : NaN;
+      amountInput.value = (!isNaN(presetAmt) && presetAmt >= 1000) ? presetAmt : claimDefault();
+      if(!isNaN(presetAmt) && presetAmt >= 1000) claimTouched = true;
+    }
+    updateClaim();
+    /* Jump to a shop row from a shop-page anchor link. */
+    const hash = location.hash || "";
+    if(hash.indexOf("#shop-") === 0){
+      const targetId = hash.slice(6);
+      const idx = boardShops.findIndex(s => s.id === targetId);
+      if(idx >= 0) boardPage = Math.floor(idx / PAGE_SIZE) + 1;
+    }
+    renderTable();
+    if(hash.indexOf("#shop-") === 0){
+      const row = document.getElementById("shop-" + hash.slice(6));
+      if(row){ row.scrollIntoView({block:"center"}); row.classList.add("flash"); }
+    }
+  }
 }
 render();
 loadLiveShops().then(render);

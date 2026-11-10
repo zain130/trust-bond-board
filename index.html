@@ -4,11 +4,26 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ShoppingOye — Pakistan ki bharosemand online shops</title>
-<link rel="stylesheet" href="assets/style.css?v=10">
+<link rel="stylesheet" href="assets/style.css?v=11">
 <link rel="icon" type="image/svg+xml" href="assets/logo-mark.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script>
+try{var t=localStorage.getItem("so-theme");if(t==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}
+document.addEventListener("DOMContentLoaded",function(){
+  var b=document.getElementById("theme-toggle");
+  if(!b)return;
+  var sync=function(){var d=document.documentElement.getAttribute("data-theme")==="dark";b.textContent=d?"☀️":"🌙";b.setAttribute("aria-label",d?"Switch to light mode":"Switch to dark mode");b.title=b.getAttribute("aria-label");};
+  sync();
+  b.addEventListener("click",function(){
+    var d=document.documentElement.getAttribute("data-theme")==="dark";
+    if(d){document.documentElement.removeAttribute("data-theme");try{localStorage.setItem("so-theme","light");}catch(e){}}
+    else{document.documentElement.setAttribute("data-theme","dark");try{localStorage.setItem("so-theme","dark");}catch(e){}}
+    sync();
+  });
+});
+</script>
 </head>
 <body>
 <header class="site"><div class="wrap">
@@ -18,7 +33,7 @@
     <a class="cta" href="submit.html">List Your Shop</a>
     <a href="dispute.html">Complaint</a>
     <a href="rules.html">Rules</a>
-    <a href="dashboard.html">Seller login</a>
+    <a href="dashboard.html">Seller login</a> <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode" title="Switch to dark mode">🌙</button>
   </nav>
 </div></header>
 <div class="wrap">
@@ -68,18 +83,21 @@
   ShoppingOye v0 (demo). Bond money is held as amanat and is refundable on clean exit minus a 10% platform fee. Boost is a one-time cumulative payment, non-refundable. A shop's earlier boost always counts toward its total. Paid ranks are always labelled.
 </div></footer>
 <script src="assets/supabase.js"></script>
-<script src="assets/data.js"></script>
+<script src="assets/data.js?v=3"></script>
 <script>
 function render(){
 document.getElementById("c-shops").textContent = SHOPS.length;
 document.getElementById("c-bond").textContent = money(SHOPS.reduce((s,x)=>s+x.bond,0));
 document.getElementById("cat-grid").innerHTML = CATEGORIES.map(c => {
-  const n = SHOPS.filter(s => s.cat === c.slug).length;
-  return `<a class="card" href="board.html?cat=${c.slug}"><div class="icon">${c.icon}</div><h3>${c.name}</h3><p>${n} demo shops · ${c.subs.slice(0,3).join(", ")}…</p></a>`;
+  const leaders = topInCategory(c.slug, 3);
+  const leadersHtml = leaders.length
+    ? `<div class="leaders">${leaders.map((s,i) => `<span>#${i+1} ${s.name} — <b>${money(s.boost)}</b></span>`).join("")}</div>`
+    : `<p>No shops yet — be the first.</p>`;
+  return `<a class="card" href="board.html?cat=${c.slug}"><div class="icon">${c.icon}</div><h3>${c.name}</h3><p>${leaders.length} shop${leaders.length === 1 ? "" : "s"} · ${c.subs.slice(0,3).join(", ")}…</p>${leadersHtml}</a>`;
 }).join("");
 const top = [...SHOPS].sort((a,b)=>(b.boost-a.boost)||(b.bond-a.bond)).slice(0,5);
 document.getElementById("top-shops").innerHTML = top.map((s,i) => `
-  <div class="shoprow"><div class="rank ${i===0?"r1":i===1?"r2":i===2?"r3":""}" tabindex="0">#${i+1}<span class="claim-tip">Claim this ranking for ${money(s.boost + 1000)}</span></div><div>
+  <div class="shoprow"><div class="rank ${i===0?"r1":i===1?"r2":i===2?"r3":""}" tabindex="0">#${i+1}<button type="button" class="claim-tip" data-claim="${claimPrice(s)}" data-cat="${s.cat}">Claim this ranking for ${money(claimPrice(s))}</button></div><div>
     <h3><a href="shop.html?id=${s.id}">${s.name}</a></h3>
     <p>${catBySlug(s.cat).name} · ${s.tag} · ${s.city}</p>
     <p><span class="badge">Trust Bond ${money(s.bond)}</span> ${s.bondVerified ? `<span class="badge">✓ Bond Protected</span>` : ""} <span class="badge goldb">Boost paid ${money(s.boost)}</span></p>
@@ -96,6 +114,11 @@ function applyFilter(){
   });
 }
 document.getElementById("shop-search").addEventListener("input", applyFilter);
+document.getElementById("top-shops").addEventListener("click", function(e){
+  const pill = e.target.closest(".claim-tip");
+  if(!pill) return;
+  location.href = "board.html?cat=" + pill.getAttribute("data-cat") + "&claim=" + pill.getAttribute("data-claim");
+});
 render();
 loadLiveShops().then(render);
 /* Smooth reveal for the live-board preview (second section). */
