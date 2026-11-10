@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ShoppingOye — Pakistan ki bharosemand online shops</title>
-<link rel="stylesheet" href="assets/style.css?v=9">
+<link rel="stylesheet" href="assets/style.css?v=10">
 <link rel="icon" type="image/svg+xml" href="assets/logo-mark.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -79,7 +79,7 @@ document.getElementById("cat-grid").innerHTML = CATEGORIES.map(c => {
 }).join("");
 const top = [...SHOPS].sort((a,b)=>(b.boost-a.boost)||(b.bond-a.bond)).slice(0,5);
 document.getElementById("top-shops").innerHTML = top.map((s,i) => `
-  <div class="shoprow"><div class="rank">#${i+1}</div><div>
+  <div class="shoprow"><div class="rank ${i===0?"r1":i===1?"r2":i===2?"r3":""}" tabindex="0">#${i+1}<span class="claim-tip">Claim this ranking for ${money(s.boost + 1000)}</span></div><div>
     <h3><a href="shop.html?id=${s.id}">${s.name}</a></h3>
     <p>${catBySlug(s.cat).name} · ${s.tag} · ${s.city}</p>
     <p><span class="badge">Trust Bond ${money(s.bond)}</span> ${s.bondVerified ? `<span class="badge">✓ Bond Protected</span>` : ""} <span class="badge goldb">Boost paid ${money(s.boost)}</span></p>
@@ -98,6 +98,17 @@ function applyFilter(){
 document.getElementById("shop-search").addEventListener("input", applyFilter);
 render();
 loadLiveShops().then(render);
+/* Smooth reveal for the live-board preview (second section). */
+(function(){
+  var pv = document.querySelector(".preview");
+  if(!pv) return;
+  pv.classList.add("reveal");
+  if(!("IntersectionObserver" in window)){ pv.classList.add("in"); return; }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ pv.classList.add("in"); io.disconnect(); } });
+  }, {threshold:.12});
+  io.observe(pv);
+})();
 </script>
 </body>
 </html>
